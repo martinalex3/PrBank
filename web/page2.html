@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="assets/images/iconimg.png" type="image/x-icon">
+  <!-- -->
+  <title>Iniciar Sesión</title>
+  <link rel='stylesheet' title='Estilo Normal/Claro' type='text/css' href="assets/theme/css/estilos.css">
+  <link rel='stylesheet' title='Estilo Oscuro' type="text/css" href="assets/theme/css/altestilos1.css">
+  <link rel='stylesheet' title='Estilo neo' type="text/css" href="assets/theme/css/altestilos2.css">
+  <link rel='stylesheet' title='Estilo sunshine' type="text/css" href="assets/theme/css/altestilos3.css">
+  <script src="assets/theme/js/signin.js"></script>
+</head>
+<body>
+  <div class="contenedor">
+    <h1>Inicie Sesión</h1>
+    <form action= "/CRUDBankServerSide/webresources/customer/sigin/" method="POST" id="signInForm">
+       <!-- Campos -->
+      <input type="email" id="tfEmail" name="tfEmail" placeholder="Correo Electrónico" required>
+      <input type="password" id="tfPassword" name="tfPassword" placeholder="Contraseña" required>
+      <!-- Botones -->
+      <div class="botones">
+          <button type="button" class="cancelar" id="btnCancel" onclick="handleCancelOnClick()">Cancelar</button>
+        <button type="submit" class="iniciar" id="btSignIn" onclick="handleSignInOnClick(event);"> Iniciar Sesión</button>
+        <button type="button" class="volver" id="btnVolver" onclick="handleBackOnClick()">Volver al SignUp</button>
+      </div>
+    </form>
+    <div id="responseMsg"></div>
+  </div>
+</body>
+</html>
