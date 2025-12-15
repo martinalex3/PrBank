@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="assets/images/icon.png" type="image/x-icon">
+
+  <title>Registro - PrBank</title>
+
+  <!-- CSS unificado -->
+  <link rel="stylesheet" href="assets/theme/css/styles.css">
+
+  <!-- JS original -->
+  <script src="assets/theme/js/SignUP.js"></script>
+
+  <style>
+    /* Ajuste para que todos los inputs tengan el mismo estilo que el Sign In */
+    .recuadro-formulario input {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 12px;
+        border: 1px solid var(--blue-dark);
+        border-radius: 8px;
+        font-size: 1rem;
+        box-sizing: border-box;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <h1>PrBank</h1>
+  </header>
+
+  <!-- MENSAJE DE BIENVENIDA -->
+  <section class="bienvenida">
+    <h2>Únete a PrBank</h2>
+    <p>Crea tu cuenta para empezar a gestionar tus finanzas de forma segura.</p>
+  </section>
+
+  <!-- CONTENEDOR CENTRAL -->
+  <main class="contenedor-central">
+    <div class="recuadro-principal">
+
+      <div class="recuadro-formulario">
+        <h3>Registro de Usuario</h3>
+
+        <form action="/CRUDBankServerSide/webresources/customer" method="POST" id="signUpForm">
+
+          <input type="text" name="tfName" id="tfName" placeholder="Nombre" required>
+          <input type="text" name="tfLastname" id="tfLastname" placeholder="Apellido" required>
+          <input type="text" name="tfMiddlelinitial" id="tfMiddlelinitial" placeholder="Inicial Primer Apellido" required>
+          <input type="text" name="tfStreet" id="tfStreet" placeholder="Calle" required>
+          <input type="text" name="tfCity" id="tfCity" placeholder="Ciudad" required>
+          <input type="text" name="tfState" id="tfState" placeholder="País" required>
+          <input type="text" name="tfZip" id="tfZip" placeholder="Código Postal" required>
+          <input type="tel" name="tfPhone" id="tfPhone" placeholder="Teléfono" required>
+          <input type="email" name="tfEmail" id="tfEmail" placeholder="Correo Electrónico" required>
+          <input type="password" name="tfPassword" id="tfPassword" placeholder="Contraseña" required>
+          <input type="password" name="rpassword" id="rpassword" placeholder="Repetir Contraseña" required>
+
+          <div class="botones">
+            <button type="button" class="cancelar" onclick="redirectToIndex()">Cancelar</button>
+            <button type="reset" class="cancelar">Borrar</button>
+            <button type="button" class="iniciar" onclick="handleSignUpClick(event)">Regístrate</button>
+          </div>
+
+        </form>
+        <div id="responseMsg"></div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>© 2025 PrBank - Todos los derechos reservados.</p>
+  </footer>
+
+</body>
+</html>

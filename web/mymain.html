@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="assets/images/icon.png" type="image/x-icon">
+  <link rel="stylesheet" href="assets/theme/css/styles.css">
+  <title>PrBank - Panel</title>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header-bar">
+    <div class="header-content">
+      <h1>PrBank</h1>
+      <span class="logout-link" onclick="logout()">Cerrar sesión</span>
+    </div>
+  </header>
+
+  <!-- MENSAJE DE BIENVENIDA -->
+  <section class="bienvenida">
+    <h2>Bienvenido a PrBank, @usuario.</h2>
+    <p>Gestiona tus cuentas y operaciones desde aquí.</p>
+  </section>
+
+  <!-- MENÚ PRINCIPAL -->
+  <main class="menu-container">
+
+    <div class="card" onclick="window.location.href='myaccounts.html'">
+      <img src="assets/images/accounts.png" alt="Cuentas">
+      <p>Cuentas</p>
+    </div>
+    <div class="card" onclick="window.location.href='changepassword.html'">
+      <img src="assets/images/changepw.png" alt="Cambiar contraseña">
+      <p>Cambiar contraseña</p>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>© 2025 PrBank. Todos los derechos reservados.</p>
+    <p>Alejandro Martín, Kenneth León, David Aranda.</p>
+  </footer>
+
+  <!-- SCRIPT -->
+  <script>
+    function logout() {
+      // Aquí puedes limpiar sesión si lo necesitas
+      // localStorage.clear();
+      window.location.href = 'index.html';
+    }
+  </script>
+
+</body>
+</html>

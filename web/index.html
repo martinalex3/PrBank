@@ -1,16 +1,45 @@
 <!DOCTYPE html>
-<!--
-To change this license header, choose License Headers in Project Properties.
-To change this template file, choose Tools | Templates
-and open the template in the editor.
--->
-<html>
-    <head>
-        <title>TODO supply a title</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    </head>
-    <body>
-        <div>TODO write content</div>
-    </body>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="assets/images/icon.png" type="image/x-icon">
+  <link rel="stylesheet" href="assets/theme/css/styles.css">
+  <title>PrBank - Inicio</title>
+</head>
+<body>
+
+  <!-- CABECERA -->
+  <header>
+    <h1>PrBank</h1>
+  </header>
+
+  <!-- MENSAJE DE BIENVENIDA -->
+  <section class="bienvenida">
+    <h2>Bienvenido a PrBank</h2>
+    <p>Tu banco de confianza. Regístrate o inicia sesión para gestionar tus cuentas.</p>
+  </section>
+
+  <!-- CUADROS PRINCIPALES -->
+  <main class="menu-container">
+
+    <div class="card" onclick="window.location.href='signup.html'">
+      <img src="assets/images/registro.jpg" alt="Registrarse">
+      <p>Registrarse</p>
+    </div>
+
+    <div class="card" onclick="window.location.href='signin.html'">
+      <img src="assets/images/inicio.jpg" alt="Iniciar sesión">
+      <p>Iniciar Sesión</p>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>© 2025 PrBank. Todos los derechos reservados.</p>
+    <p>Alejandro Martín, Kenneth León, David Aranda.</p>
+  </footer>
+
+</body>
 </html>

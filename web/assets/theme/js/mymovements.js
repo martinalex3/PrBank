@@ -13,4 +13,22 @@
  * seria con functionhandleLoad(){     }
  * objetos que voy a manejar: document.addEventListener ("load", 
  */
+/*
+ * Para añadir todo desde java, quitamos el onclick y lo llevamos al java (el id debe de estar en el html)
+ * Attributes to be used by this controller
+ * const signInForm=document.getElementbyID("signInForm");
+ * const tfEmail=document.getElementbyID("tfEmail");
+ * const tfPasword=document.getElementbyID("tfPassword");
+ * const btnSingnIn=document.getElementbyID("btnSignIn");
+ * const responseMsg=document.getElementbyID("responseMsg");
+ * 
+ * Event handler association
+ * signInForm.addEventListener("submit",handleFormSubmit);
+ * btnSignIn.addEventListener("click",handleSignInOnClick);
+ * tfEmail.addEventListener("blur",handleEmailBlur);
+ */
 
+/*
+ * No podemos usar clases literales, deben usarse constructores o funciones
+ * Necesitaremos construir un SET
+ */
