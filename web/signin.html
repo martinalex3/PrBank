@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="assets/images/icon.png" type="image/x-icon">
+
+  <title>Iniciar Sesión - PrBank</title>
+  <!-- LINKS EXTERNOS -->
+  <!-- CSS unificado -->
+  <link rel="stylesheet" href="assets/theme/css/styles.css">
+  <!-- JS original -->
+  <script src="assets/theme/js/signin.js"></script>
+  <!-- FIN LINKS EXTERNOS -->
+</head>
+<body>
+  <!-- HEADER -->
+  <header>
+    <h1>PrBank</h1>
+  </header>
+  <!-- MENSAJE DE BIENVENIDA -->
+  <section class="bienvenida">
+    <h2>Bienvenido de nuevo</h2>
+    <p>Accede a tu cuenta de forma segura.</p>
+  </section>
+  <!-- CONTENEDOR CENTRAL -->
+  <main class="contenedor-central">
+    <div class="recuadro-principal">
+      <div class="recuadro-formulario">
+        <h3>Iniciar Sesión</h3>
+
+        <form action="/CRUDBankServerSide/webresources/customer/sigin/" method="POST" id="signInForm">
+
+          <input type="email" id="tfEmail" name="tfEmail" placeholder="Correo Electrónico" required>
+          <input type="password" id="tfPassword" name="tfPassword" placeholder="Contraseña" required>
+
+          <div class="botones">
+            <button type="button" class="cancelar" id="btnCancel" onclick="handleCancelOnClick()">Cancelar</button>
+            <button type="submit" class="iniciar" id="btSignIn" onclick="handleSignInOnClick(event);">Iniciar Sesión</button>
+            <button type="button" class="volver" id="btnVolver" onclick="handleBackOnClick()">Volver al SignUp</button>
+          </div>
+
+        </form>
+        <div id="responseMsg"></div>
+      </div>
+    </div>
+  </main>
+  <!-- FOOTER -->
+  <footer>
+    <p>© 2025 PrBank - Todos los derechos reservados.</p>
+  </footer>
+</body>
+</html>

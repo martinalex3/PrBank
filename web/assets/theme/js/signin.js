@@ -97,7 +97,7 @@ function sendSignInRequestAndProcessResponse() {
         storeResponseXMLData(xmlString);
         // Redirigir automáticamente a la pagina sguiente en caso de todo OK
         setTimeout(() => {
-            window.location.href = 'principalpr.html';
+            window.location.href = 'mymain.html';
         }, 1000);
     })
     //Recogida de errores
@@ -119,7 +119,7 @@ window.addEventListener('load', function() {
 });
 //--Funcion Volver al SignUp Boton
 function handleBackOnClick() {
-    window.location.href = 'page1.html';
+    window.location.href = 'signup.html';
 }
 
 //GetElementsByTagName
