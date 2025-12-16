@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="shortcut icon" href="assets/images/iconimg.png" type="image/x-icon">
+<link rel="stylesheet" href="assets/theme/css/styles.css">
+<title>Cambiar contraseña - PrBank</title>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header-bar">
+<div class="header-content">
+<h1>PrBank</h1>
+<span class="logout-link" onclick="logout()">Cerrar sesión</span>
+</div>
+</header>
+
+<!-- MENSAJE -->
+<section class="bienvenida">
+<h2>Cambiar contraseña</h2>
+<p>Introduce tu contraseña actual y define una nueva.</p>
+</section>
+
+<!-- CONTENEDOR CENTRAL -->
+<main class="contenedor-central">
+<div class="recuadro-principal">
+<div class="recuadro-formulario">
+
+<h3>Actualizar contraseña</h3>
+
+<form id="form-cambio">
+
+<input type="password" id="campoactual" placeholder="Contraseña actual" required>
+<input type="password" id="camponueva" placeholder="Contraseña nueva" required>
+<input type="password" id="camporepetir" placeholder="Confirmar contraseña" required>
+
+<pre class="requisitos-pwd">
+<u>Requisitos contraseña:</u>
+· Mínimo 8 caracteres
+· Máximo 255 caracteres
+· Mayúsculas y minúsculas
+· Al menos un número
+· Un carácter especial
+</pre>
+
+<div class="botones">
+<button type="button" class="cancelar" id="btn-cancelar-cambio">
+Cancelar
+</button>
+
+<button type="reset" class="cancelar" id="btn-limpiar-campos">
+Borrar
+</button>
+
+<button type="submit" class="iniciar" id="btn-confirmar-cambio">
+Confirmar
+</button>
+</div>
+
+</form>
+
+<!-- MENSAJES -->
+<div id="responseMsg"></div>
+
+</div>
+</div>
+</main>
+
+<!-- FOOTER -->
+<footer>
+<p>© 2025 PrBank. Todos los derechos reservados.</p>
+</footer>
+
+<!-- JS -->
+<script src="assets/theme/js/JSPRclase.js"></script>
+<script>
+function logout() {
+window.location.href = 'index.html';
+}
+</script>
+
+</body>
+</html>

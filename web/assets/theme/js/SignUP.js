@@ -136,7 +136,7 @@ function handleSuccessfulRegistration(data = "Datos no disponibles") {
 
     setTimeout(() => {
         console.log("Redirigiendo a page2.html...");
-        window.location.href = 'page2.html'; 
+        window.location.href = 'signin.html'; 
     }, 1500);
 
     document.getElementById("signUpForm").reset(); 
