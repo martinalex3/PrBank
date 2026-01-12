@@ -3,32 +3,42 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-// Cosas a definir para la creacion del js del movimiento
-/*Necesitamos tablas , formularios, enlaces.
- * SIGNIN: Neceistaremos mejorar en orden:
- * ((.window, .document)no hacen falta inicializarlos), (inputEmail, inputPassword), buttonSend, formSignIn
- * A la hora de hacer el functionhandleonload, para guardar la informacion, es util para obtener la informacion del 
- * sessionStorage, ya que con ello podemos nombrar el correo del proceso del signup para que a la hora de iniciar sesion, se rellene
- * automaticamente el campo del correo electronico y que el foco este situado en el campo de la contraseña.
- * seria con functionhandleLoad(){     }
- * objetos que voy a manejar: document.addEventListener ("load", 
- */
-/*
- * Para añadir todo desde java, quitamos el onclick y lo llevamos al java (el id debe de estar en el html)
- * Attributes to be used by this controller
- * const signInForm=document.getElementbyID("signInForm");
- * const tfEmail=document.getElementbyID("tfEmail");
- * const tfPasword=document.getElementbyID("tfPassword");
- * const btnSingnIn=document.getElementbyID("btnSignIn");
- * const responseMsg=document.getElementbyID("responseMsg");
- * 
- * Event handler association
- * signInForm.addEventListener("submit",handleFormSubmit);
- * btnSignIn.addEventListener("click",handleSignInOnClick);
- * tfEmail.addEventListener("blur",handleEmailBlur);
- */
+const SERVICE_URL = "/CRUDBankServerSide/webresources/movement/account/";
+/**LINEA PROVISIONAL**/
+sessionStorage.setItem("account.id", 2654785441);
+//Linea DOM
+document.addEventListener("DOMContentLoaded", buildMovementsTable);
+/*Fetch Users in JSON format*/
+async function fetchMovements() {
+    const response = await fetch(SERVICE_URL + `${sessionStorage.getItem("account.id")}`, {
+        method: "GET",
+        headers: {
+            "Accept": "application/json"
+        }
+    });
+    const jsonText = await response.json();
+    return jsonText;
+}
+// Generador de funciones que recoge lineas de tabla
+function* userRowGenerator(movements) {
+    for (const movement of movements) {
+        const tr = document.createElement("tr");
+        
+        ["id", "timestamp", "amount", "balance", "description"].forEach(field => {
+            const td = document.createElement("td");
+            td.textContent = movement[field];
+            tr.appendChild(td);
+        });
+        
+        yield tr;
+    }
+}
 
-/*
- * No podemos usar clases literales, deben usarse constructores o funciones
- * Necesitaremos construir un SET
- */
+async function buildMovementsTable (){
+    const movements = await fetchMovements();
+    const tbody = document.querySelector("#tableBody");
+    const rowGenerator = userRowGenerator(movements);
+    for (const row of rowGenerator) {
+        tbody.appendChild(row);
+    }
+}
