@@ -3,15 +3,26 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+//ARRAY FECHAS CORRECTAS
 const regexBasica = /^(\d{2})\/(\d{2})\/(\d{4})$/;
 
-//LEER TABLAS EN EL SERVIDOR (cRud)
 //PATH PARAM DEL SERVIDOR
 const SERVICE_URL = "/CRUDBankServerSide/webresources/movement/account/";
+//PATH PARAM del DELETE de MOVIMIENTOS.
+const SERVICE_DEL_URL = "/CRUDBankServerSide/webresources/movement/";
+
+//ARRAY GLOBAL MOVEMENTS
+let movements = [];
+
 /**LINEA PROVISIONAL**/
-sessionStorage.setItem("account.id", 2654785441);
+sessionStorage.setItem("account.id", 3252214522);
+
 //LINEA DOM
 document.addEventListener("DOMContentLoaded", buildMovementsTable);
+
+//LINEA BORRADO ADDEVENTLISTENER
+
+//LEER TABLAS EN EL SERVIDOR (cRud)
 /*FETCH MOVEMENTS IN JSON FORMAT*/
 async function fetchMovements() {
     const response = await fetch(SERVICE_URL + `${sessionStorage.getItem("account.id")}`, {
@@ -33,31 +44,30 @@ function* userRowGenerator(movements) {
             td.textContent = movement[field];
             tr.appendChild(td);
         });
-        
         yield tr;
     }
 }
 //FUNCION DE CREAR TABLA DE MOVIMIENTOS
 async function buildMovementsTable (){
-    const movements = await fetchMovements();
+    movements = await fetchMovements();
     const tbody = document.querySelector("#tableBody");
     const rowGenerator = userRowGenerator(movements);
     for (const row of rowGenerator) {
         tbody.appendChild(row);
     }
+    document.getElementById("btnUndo").addEventListener("click", deleteMovement);
+
 }
 //CREACIÓN DE MOVIMIENTOS (Crud)
 /*Para crear un movimiento deberemos añadir un boton (ya puesto, en el que nos permita añadir movimientos de las cuentas, con una cuantia, en el que se
  * aumentará o se reducirá el balance dependiendo de si es un ingreso o una retirada, en la parte del html deberá aparecer una pantalla mostrando la
  * opcion de ingresar o retirar para despues sumar o restar el saldo que haya en dicha cuenta*/
 function createMovement() {
-    
+
 }
 //ELIMINACION DE MOVIMIENTOS (cruD)
-/*Para la eliminacion de los datos, es muy importante crear un boton fuera de la tabla, para que sea mas facil para el usuario, y solo se podrá
- * borrar/deshacer el ultimo movimiento. Para ello podemos meter un metodo manejador en el cual debemos  poner el array fuera de la funcion y podremos
- * eliminarlo con un delete, pero solo el ultimo movimeinto, que se cogera mediante el ID mas largo, o la fecha mas reciente.*/
-function deleteMovement() {
-    
+function deleteMovement(evt) {
+  const movid = movements[movements.length-1].id;
+        fetch(SERVICE_DEL_URL + `${encodeURIComponent(movid)}`);
 }
 //ACTUALIZACION DE DATOS EN CUENTAS (crUd)

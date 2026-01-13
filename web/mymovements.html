@@ -37,42 +37,49 @@
     <main>
         <div class="contenedor-central">
             <div class="recuadro-principal" style="width: 95%; flex-direction: column;">
-                <div style="text-align: right; width: 100%; margin-bottom: 15px;">
-                    <button id="btnOpen" class="iniciar" style="width:auto; padding:10px 20px;">
-                        + Nuevo Movimiento
-                    </button>
+
+    <!-- Botón crear -->
+    <div style="text-align: right; width: 100%; margin-bottom: 15px;">
+        <button id="btnOpen" class="iniciar" style="width:auto; padding:10px 20px;">
+            New Movement
+        </button>
+    </div>
+    <!-- Botón deshacer -->
+    <div style="text-align: right; width: 100%; margin-bottom: 15px;">
+        <button id="btnUndo" class="cancelar" style="width:auto; padding:10px 20px;">
+            Undo Last Movement
+        </button>
+    </div>
+            <table class="tabla-bancaria">
+                <thead>
+                    <tr>
+                        <th>TimeStamp</th>
+                        <th>Description</th>
+                        <th>Amount</th>
+                        <th>Balance</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+    </div>
+    <!-- FORMULARIO -->
+    <!--<div id="formLayer" class="capa-overlay" style="display:none;">
+        <div class="recuadro-principal">
+            <h3>Crear Nuevo Movimiento</h3>
+            <form id="formAccount">
+                <input type="text" id="tfDesc" placeholder="Descripción" required
+                        style="width:100%; margin-bottom:10px; padding:10px;">
+
+                <input type="number" id="tfBalance" placeholder="0.00" step="0.01" required
+                        style="width:100%; margin-bottom:10px; padding:10px;">
+                <div class="botones">
+                    <button type="submit" class="iniciar">Guardar</button>
+                    <button type="button" id="btnClose" class="cancelar">Cancelar</button>
                 </div>
-                <table class="tabla-bancaria">
-                    <thead>
-                        <tr>
-                            <th>TimeStamp</th>
-                            <th>Description</th>
-                            <th>Amount</th>
-                            <th>Balance</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody"></tbody>
-                </table>
-            </div>
+            </form>
         </div>
-        <!-- FORMULARIO -->
-        <div id="formLayer" class="capa-overlay" style="display:none;">
-            <div class="recuadro-principal">
-                <h3>Crear Nuevo Movimiento</h3>
-
-                <form id="formAccount">
-                    <input type="text" id="tfDesc" placeholder="Descripción" required
-                           style="width:100%; margin-bottom:10px; padding:10px;">
-
-                    <input type="number" id="tfBalance" placeholder="0.00" step="0.01" required
-                           style="width:100%; margin-bottom:10px; padding:10px;">
-                    <div class="botones">
-                        <button type="submit" class="iniciar">Guardar</button>
-                        <button type="button" id="btnClose" class="cancelar">Cancelar</button>
-                    </div>
-                </form>
-            </div>
-        </div>
+    </div>-->
     </main>
     <!-- JS DE NAVEGACIÓN -->
     <script>
