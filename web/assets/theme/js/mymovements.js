@@ -4,8 +4,7 @@
  * and open the template in the editor.
  */
 //ARRAY FECHAS CORRECTAS
-const regexBasica = /^(\d{2})\/(\d{2})\/(\d{4})$/;
-
+const regexFechayHora = /^(\d{2})\/(\d{2})\/(\d{4})(?:\s+([01]\d|2[0-3]):([0-5]\d))?$/;
 //PATH PARAM DEL SERVIDOR
 const SERVICE_URL = "/CRUDBankServerSide/webresources/movement/account/";
 //PATH PARAM del DELETE de MOVIMIENTOS.
@@ -19,7 +18,6 @@ sessionStorage.setItem("account.id", 3252214522);
 
 //LINEA DOM
 document.addEventListener("DOMContentLoaded", buildMovementsTable);
-
 //LINEA BORRADO ADDEVENTLISTENER
 
 //LEER TABLAS EN EL SERVIDOR (cRud)
@@ -56,14 +54,20 @@ async function buildMovementsTable (){
         tbody.appendChild(row);
     }
     document.getElementById("btnUndo").addEventListener("click", deleteMovement);
-
 }
 //CREACIÓN DE MOVIMIENTOS (Crud)
 /*Para crear un movimiento deberemos añadir un boton (ya puesto, en el que nos permita añadir movimientos de las cuentas, con una cuantia, en el que se
  * aumentará o se reducirá el balance dependiendo de si es un ingreso o una retirada, en la parte del html deberá aparecer una pantalla mostrando la
  * opcion de ingresar o retirar para despues sumar o restar el saldo que haya en dicha cuenta*/
-function createMovement() {
-
+async function createMovement(evt) {
+    const response = await fetch(SERVICE_URL + `${encodeURIComponent("account.id")}`, {
+        method: "POST",
+        headers: {
+            "Accept": "application/json"
+        }
+    });
+    const jsonText = await response.json();
+    return jsonText;
 }
 //ELIMINACION DE MOVIMIENTOS (cruD)
 function deleteMovement(evt) {
