@@ -1,0 +1,90 @@
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="assets/theme/images/icon.png" type="image/x-icon">
+    <title>Movimientos - PrBank</title>
+    <!-- LINKS EXTERNOS -->
+    <!-- CSS unificado -->
+    <link rel="stylesheet" href="assets/theme/css/styles.css">
+    <!-- JS Original -->
+    <script src="assets/theme/js/myaccounts.js"></script>
+    <script src="assets/theme/js/model.js"></script>
+    <!-- FIN LINKS EXTERNOS -->  
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <h1>PrBank</h1>
+            </div>
+            <div class="nav-links">
+                <a href="index.html">Volver al Inicio</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="welcome-section">
+            <h1>Bienvenido a tus Cuentas</h1>
+            <p>Realiza tus gestiones de forma segura.</p>
+        </section>
+
+        <div class="cuentas-container">
+            <div class="tabla-acciones">
+                <button id="btn-nueva-cuenta" class="btn-nueva-cuenta">+ Nueva Cuenta</button>
+            </div>
+
+            <div class="tabla-container">
+                <table class="tabla-cuentas">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Descripción</th>
+                            <th>Saldo</th>
+                            <th>Tipo</th>
+                            <th>Fecha</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="crear-cuenta-container" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center;">
+            <div class="crear-cuenta-card" style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.2);">
+                <h2>Crear Nueva Cuenta</h2>
+                <form id="formAccount">
+                    <label for="description">Descripción:</label><br>
+                    <input type="text" id="description" name="description" required style="width:100%; margin-bottom:1rem;"><br>
+
+                    <label for="balance">Saldo Inicial:</label><br>
+                    <input type="number" id="balance" name="balance" required style="width:100%; margin-bottom:1rem;"><br>
+
+                    <label for="type">Tipo de Cuenta:</label><br>
+                    <select id="type" name="type" style="width:100%; margin-bottom:1.5rem; padding: 5px;">
+                        <option value="0">STANDARD</option>
+                        <option value="1000">CREDIT</option>
+                    </select>
+
+                    <div class="form-buttons" style="display: flex; justify-content: space-between;">
+                        <button type="button" class="btn-save" style="background: green; color: white; padding: 10px 20px; border: none; cursor: pointer;">Guardar</button>
+                        <button type="button" class="btn-cancel" style="background: red; color: white; padding: 10px 20px; border: none; cursor: pointer;">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/myaccounts.js"></script>
+</body>
+</html>
