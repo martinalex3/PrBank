@@ -5,15 +5,17 @@ document.addEventListener("DOMContentLoaded", pageLoadHandler);
 
 // 0. Obtener cuentas del servidor
 async function fetchAccounts() {
-    const customerId = sessionStorage.getItem("customer.id");
+    // IMPORTANTE: Limpiar el ID de comas (ej: "102,263" -> "102263")
+    const customerId = sessionStorage.getItem("customer.id").replace(/[,.]/g, "");
     const response = await fetch(SERVICE_URL + customerId, {
         method: "GET",
         headers: { "Accept": "application/json" }
     });
+    if (!response.ok) throw new Error("Error al obtener cuentas");
     return await response.json();
 }
 
-// 1. Generador de filas para la tabla
+// 1. Generador de filas para la tabla (Sin cambios)
 function* userRowGenerator(accounts) {
     for (const account of accounts) {
         const tr = document.createElement("tr");
@@ -30,7 +32,6 @@ function* userRowGenerator(accounts) {
 
         const tdAction = document.createElement("td");
 
-        // Botón Ver Movimientos
         const btnVer = document.createElement("button");
         btnVer.textContent = "Movimientos";
         btnVer.onclick = () => {
@@ -39,7 +40,6 @@ function* userRowGenerator(accounts) {
         };
         tdAction.appendChild(btnVer);
 
-        // Botón Borrar
         const btnBorrar = document.createElement("button");
         btnBorrar.textContent = "Borrar";
         btnBorrar.classList.add("btn-borrar");
@@ -61,7 +61,6 @@ async function pageLoadHandler() {
         const tbody = document.querySelector("#tableBody");
         tbody.innerHTML = "";
 
-        // --- DELEGACIÓN DE EVENTOS (BORRAR) ---
         tbody.onclick = async (event) => {
             if (event.target.classList.contains("btn-borrar")) {
                 const id = event.target.getAttribute("data-id");
@@ -70,13 +69,17 @@ async function pageLoadHandler() {
                     if (res.ok) {
                         pageLoadHandler();
                     } else {
-                        alert("Error: No se puede borrar una cuenta con movimientos (Integridad Referencial).");
+                        alert("Error: No se puede borrar una cuenta con movimientos.");
                     }
                 }
             }
         };
 
-        // --- LÓGICA DEL FORMULARIO (CREAR) ---
+        function generateRandomAccountId () { 
+            // Generamos un ID más corto para evitar problemas con el Long de Java
+            return Math.floor(Math.random() * 100000000); 
+        }
+
         const capa = document.querySelector(".crear-cuenta-container");
         document.getElementById("btn-nueva-cuenta").onclick = () => capa.style.display = "flex";
         document.querySelector(".btn-cancel").onclick = () => {
@@ -84,22 +87,26 @@ async function pageLoadHandler() {
             document.getElementById("formAccount").reset();
         };
 
-        // BOTÓN GUARDAR (POST)
+        // BOTÓN GUARDAR (POST) - CORREGIDO
         document.querySelector(".btn-save").onclick = async () => {
-            const custId = sessionStorage.getItem("customer.id");
+            // Limpiar comas del ID del cliente
+            const custIdRaw = sessionStorage.getItem("customer.id");
+            const idLimpio = parseInt(custIdRaw.replace(/[,.]/g, ""));
             
-            // Construimos el objeto exacto para Java JPA
+            // Construimos el objeto exacto para la relación ManyToMany de Account.java
             const nuevaCuenta = {
+                id: generateRandomAccountId(),
                 description: document.getElementById("description").value,
                 balance: parseFloat(document.getElementById("balance").value),
                 creditLine: parseFloat(document.getElementById("type").value),
-                beginBalanceTimestamp: new Date().toISOString(),
-                customer: {
-                    id: parseInt(custId) // Forzamos a que sea un número entero
-                }
-            };
-            
-       
+                beginBalance: parseFloat(document.getElementById("balance").value),
+                beginBalanceTimestamp: new Date().toISOString().split('.')[0] + "Z",
+                
+                // CAMBIO CLAVE: "customers" en plural y dentro de una LISTA []
+                "customers": [
+                    { "id": idLimpio }
+                ]
+            };          
 
             const response = await fetch(ACCOUNT_URL, {
                 method: "POST",
@@ -113,15 +120,13 @@ async function pageLoadHandler() {
             if (response.ok) {
                 capa.style.display = "none";
                 document.getElementById("formAccount").reset();
-                pageLoadHandler(); // Recargamos la tabla
+                // Esperamos un poquito para que a la base de datos le de tiempo
+                setTimeout(pageLoadHandler, 300); 
             } else {
-                const errorTexto = await response.text();
-                console.error("Detalle del error 500:", errorTexto);
-                alert("Error 500 del servidor. Revisa que el ID del cliente sea correcto.");
+                alert("Error al crear. Revisa la consola de GlassFish.");
             }
         };
 
-        // Pintar la tabla
         const rowGenerator = userRowGenerator(accounts);
         for (const row of rowGenerator) {
             tbody.appendChild(row);
