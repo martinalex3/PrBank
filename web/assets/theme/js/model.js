@@ -11,7 +11,7 @@
  * Descripción: Clases de datos comunes para la aplicación bancaria.
  */
 
-// 1. Clase Customer (Manejada principalmente por David en Login/Registro)
+// 1. Clase Customer (Kenneth: WP3)
 class Customer {
     constructor(id, firstName, lastName, middleInitial, street, city, state, zip, phone, email, password) {
         this.id = id;
@@ -52,12 +52,26 @@ class Account {
 
 // 3. Clase Movement (Parte de Alex: WP2)
 class Movement {
-    constructor(id, amount, description, timestamp, balance, accountId) {
+    id;
+    amount;
+    description;
+    timestamp;
+    balance;
+            
+    constructor(id, amount, description, timestamp, balance) {
         this.id = id;
         this.amount = parseFloat(amount) || 0;
         this.description = description;
         this.timestamp = timestamp;
         this.balance = parseFloat(balance) || 0;
-        this.accountId = accountId;
+    }
+    toJSON(){
+        return {
+            id: this.id,
+            amount: this.amount,
+            description: this.description,
+            timestamp: this.timestamp,
+            balance: this.balance
+        };
     }
 }

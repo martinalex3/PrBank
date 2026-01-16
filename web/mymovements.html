@@ -5,109 +5,105 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="assets/images/icon.png" type="image/x-icon">
     <title>Movimientos - PrBank</title>
-
     <!-- CSS unificado -->
     <link rel="stylesheet" href="assets/theme/css/styles.css">
-
-    <!-- JS Original -->
+    <!-- JS -->
     <script src="assets/theme/js/mymovements.js"></script>
     <script src="assets/theme/js/model.js"></script>
 </head>
-
 <body>
-
     <!-- HEADER -->
     <header class="header-bar">
         <div class="header-content">
             <h1>PrBank</h1>
-
             <div class="header-actions">
-                <!--<span class="nav-link" onclick="goToAccounts()">Cuentas</span>-->
                 <span class="logout-link" onclick="logout()">Volver al Inicio</span>
             </div>
         </div>
     </header>
-
     <!-- BIENVENIDA -->
     <section class="bienvenida">
         <h2>Bienvenido a tus movimientos</h2>
         <p>Realiza movimientos de manera segura.</p>
     </section>
-
     <main>
         <div class="contenedor-central">
             <div class="recuadro-principal" style="width: 95%; flex-direction: column;">
-
-    <!-- Botón crear -->
-    <div style="text-align: right; width: 100%; margin-bottom: 15px;">
-        <button id="btnOpen" class="iniciar" style="width:auto; padding:10px 20px;">
-            New Movement
-        </button>
-    </div>
-    <!-- Botón deshacer -->
-    <div style="text-align: right; width: 100%; margin-bottom: 15px;">
-        <button id="btnUndo" class="cancelar" style="width:auto; padding:10px 20px;">
-            Undo Last Movement
-        </button>
-    </div>
-            <table class="tabla-bancaria">
-                <thead>
-                    <tr>
-                        <th>TimeStamp</th>
-                        <th>Description</th>
-                        <th>Amount</th>
-                        <th>Balance</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody"></tbody>
-            </table>
+                <!-- BOTÓN CREAR -->
+                <div style="text-align: right; width: 100%; margin-bottom: 15px;">
+                    <button id="btnOpen" class="iniciar" style="width:auto; padding:10px 20px;">
+                        New Movement
+                    </button>
+                </div>
+                <!-- BOTÓN DESHACER -->
+                <div style="text-align: right; width: 100%; margin-bottom: 15px;">
+                    <button id="btnUndo" class="cancelar" style="width:auto; padding:10px 20px;">
+                        Undo Last Movement
+                    </button>
+                </div>
+                <!-- TABLA -->
+                <table class="tabla-bancaria">
+                    <thead>
+                        <tr>
+                            <th>TimeStamp</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                            <th>Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
         </div>
-    </div>
-    <!-- FORMULARIO -->
-    <!-- FORMULARIO NUEVO MOVIMIENTO -->
-<div id="formLayer" class="capa-overlay" style="display:none;">
-    <div class="recuadro-principal" style="max-width: 420px;">
-        <h3>Nuevo Movimiento</h3>
-        <form id="formAccount">
-            <input type="text"
-                   id="tfDesc"
-                   placeholder="Descripción del movimiento"
-                   required
-                   style="width:100%; margin-bottom:12px; padding:10px;">
-            <input type="number"
-                   id="tfAmount"
-                   placeholder="Cantidad"
-                   step="0.01"
-                   required
-                   style="width:100%; margin-bottom:12px; padding:10px;">
-            <!-- TIPO DE MOVIMIENTO-->
-            <div style="display:flex; justify-content: space-around; margin-bottom:20px;">
-                <label>
-                    <input type="radio" name="movementType" value="IN" checked>
-                    Ingreso
-                </label>
-                <label>
-                    <input type="radio" name="movementType" value="OUT">
-                    Retirada
-                </label>
-            </div>
+        <!-- FORMULARIO NUEVO MOVIMIENTO -->
+        <div id="formLayer" class="capa-overlay" style="display:none;">
+            <div class="recuadro-principal" style="max-width: 420px;">
+                <h3>Realizar Nuevo Movimiento</h3>
+                <form id="formAccount">
+                    <!-- CANTIDAD -->
+                    <input type="number"
+                           id="tfAmount"
+                           placeholder="Cantidad"
+                           step="0.01"
+                           required
+                           style="width:100%; margin-bottom:12px; padding:10px;">
 
-            <div class="botones">
-                <button type="submit" class="iniciar">Guardar</button>
-                <button type="button" id="btnClose" class="cancelar">Cancelar</button>
+                    <!-- TIPO -->
+                    <div style="display:flex; justify-content: space-around; margin-bottom:20px;">
+                        <label>
+                            <input type="radio" id="rbDeposit" name="movementType" value="IN" checked>
+                            Ingreso
+                        </label>
+                        <label>
+                            <input type="radio" id="rbPayment" name="movementType" value="OUT">
+                            Retirada
+                        </label>
+                    </div>
+                    <div class="botones">
+                        <button type="submit" class="iniciar">Guardar</button>
+                        <button type="button" id="btnClose" class="cancelar">Cancelar</button>
+                    </div>
+                </form>
             </div>
-        </form>
-    </div>
-</div>
+        </div>
+        <!-- CONFIRMACIÓN BORRADO MOVIMIENTO -->
+        <div id="confirmLayer" class="capa-overlay" style="display:none;">
+            <div class="recuadro-principal" style="max-width: 420px; text-align:center;">
+                <h3>Confirmar eliminación</h3>
+                <p>¿Estás seguro de que quieres eliminar el último movimiento?</p>
+
+                <div class="botones">
+                    <button id="btnConfirmYes" class="volver">Sí, borrar</button>
+                    <button id="btnConfirmNo" class="cancelar">No, cancelar</button>
+                </div>
+            </div>
+        </div>
     </main>
     <!-- JS DE NAVEGACIÓN -->
     <script>
         function logout() {
             window.location.href = "index.html";
         }
-        /*function goToAccounts() {
-            window.location.href = "myaccounts.html";
-        }*/
     </script>
 </body>
 </html>
