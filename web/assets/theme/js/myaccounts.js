@@ -5,7 +5,6 @@ document.addEventListener("DOMContentLoaded", pageLoadHandler);
 
 // 0. Obtener cuentas del servidor
 async function fetchAccounts() {
-    // IMPORTANTE: Limpiar el ID de comas (ej: "102,263" -> "102263")
     const customerId = sessionStorage.getItem("customer.id").replace(/[,.]/g, "");
     const response = await fetch(SERVICE_URL + customerId, {
         method: "GET",
@@ -15,7 +14,7 @@ async function fetchAccounts() {
     return await response.json();
 }
 
-// 1. Generador de filas para la tabla (Sin cambios)
+// 1. Generador de filas para la tabla
 function* userRowGenerator(accounts) {
     for (const account of accounts) {
         const tr = document.createElement("tr");
@@ -61,9 +60,18 @@ async function pageLoadHandler() {
         const tbody = document.querySelector("#tableBody");
         tbody.innerHTML = "";
 
+        // --- DELEGACIÓN DE EVENTOS (BORRAR) CON VALIDACIÓN ---
         tbody.onclick = async (event) => {
             if (event.target.classList.contains("btn-borrar")) {
                 const id = event.target.getAttribute("data-id");
+                
+                // BUSCAR LA CUENTA PARA VALIDAR MOVIMIENTOS
+                const account = accounts.find(acc => acc.id == id);
+                if (account && account.movements && account.movements.length > 0) {
+                    alert("No se puede borrar una cuenta que tenga movimientos.");
+                    return;
+                }
+
                 if (confirm(`¿Eliminar cuenta ${id}?`)) {
                     const res = await fetch(ACCOUNT_URL + id, { method: "DELETE" });
                     if (res.ok) {
@@ -76,7 +84,6 @@ async function pageLoadHandler() {
         };
 
         function generateRandomAccountId () { 
-            // Generamos un ID más corto para evitar problemas con el Long de Java
             return Math.floor(Math.random() * 100000000); 
         }
 
@@ -87,22 +94,27 @@ async function pageLoadHandler() {
             document.getElementById("formAccount").reset();
         };
 
-        // BOTÓN GUARDAR (POST) - CORREGIDO
+        // BOTÓN GUARDAR (POST) CON VALIDACIÓN DE SALDO
         document.querySelector(".btn-save").onclick = async () => {
-            // Limpiar comas del ID del cliente
+            const balance = parseFloat(document.getElementById("balance").value);
+            const creditLine = parseFloat(document.getElementById("type").value);
+
+            // VALIDACIÓN: NO PERMITIR SALDO NEGATIVO SI ES CUENTA CRÉDITO
+            if (creditLine > 0 && balance < 0) {
+                alert("Una cuenta de crédito no puede tener saldo negativo.");
+                return;
+            }
+
             const custIdRaw = sessionStorage.getItem("customer.id");
             const idLimpio = parseInt(custIdRaw.replace(/[,.]/g, ""));
             
-            // Construimos el objeto exacto para la relación ManyToMany de Account.java
             const nuevaCuenta = {
                 id: generateRandomAccountId(),
                 description: document.getElementById("description").value,
-                balance: parseFloat(document.getElementById("balance").value),
-                creditLine: parseFloat(document.getElementById("type").value),
-                beginBalance: parseFloat(document.getElementById("balance").value),
+                balance: balance,
+                creditLine: creditLine,
+                beginBalance: balance,
                 beginBalanceTimestamp: new Date().toISOString().split('.')[0] + "Z",
-                
-                // CAMBIO CLAVE: "customers" en plural y dentro de una LISTA []
                 "customers": [
                     { "id": idLimpio }
                 ]
@@ -120,10 +132,9 @@ async function pageLoadHandler() {
             if (response.ok) {
                 capa.style.display = "none";
                 document.getElementById("formAccount").reset();
-                // Esperamos un poquito para que a la base de datos le de tiempo
                 setTimeout(pageLoadHandler, 300); 
             } else {
-                alert("Error al crear. Revisa la consola de GlassFish.");
+                alert("Error al crear. Contacte al administrador.");
             }
         };
 
