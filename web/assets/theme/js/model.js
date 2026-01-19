@@ -11,7 +11,7 @@
  * Descripción: Clases de datos comunes para la aplicación bancaria.
  */
 
-// 1. Clase Customer (Kenneth: WP3)
+// 1. Clase Customer (Manejada principalmente por David en Login/Registro)
 class Customer {
     constructor(id, firstName, lastName, middleInitial, street, city, state, zip, phone, email, password) {
         this.id = id;
@@ -29,26 +29,37 @@ class Customer {
 }
 
 // 2. Clase Account (David: WP1)
-class Account {
-    /**
-     * @param {string|number} type - Puede venir como "STANDARD"/"CREDIT" o 0/1
-     */
+ class Account {
     constructor(id, description, balance, creditLine, beginBalance, beginBalanceTimestamp, type, customerId) {
         this.id = id;
         this.description = description;
-        
-        // Forzamos que los números sean números para que .toFixed(2) no falle
         this.balance = parseFloat(balance) || 0;
         this.creditLine = parseFloat(creditLine) || 0;
         this.beginBalance = parseFloat(beginBalance) || 0;
-        
         this.beginBalanceTimestamp = beginBalanceTimestamp;
-        
-        // Guardamos el tipo tal cual viene del servidor para procesarlo en la tabla
         this.type = type; 
         this.customerId = customerId;
     }
+
+    toJSON() {
+        return {
+            id: this.id,
+            description: this.description,
+            balance: this.balance,
+            creditLine: this.creditLine,
+            beginBalance: this.beginBalance,
+            beginBalanceTimestamp: this.beginBalanceTimestamp,
+            // Forzamos que el type sea siempre un número entero
+            type: parseInt(this.type),
+            // Estructura para la relación ManyToMany
+            customers: [
+                { id: parseInt(String(this.customerId).replace(/[,.]/g, "")) }
+            ]
+        };
+    }
 }
+
+
 
 // 3. Clase Movement (Parte de Alex: WP2)
 class Movement {
@@ -72,6 +83,6 @@ class Movement {
             description: this.description,
             timestamp: this.timestamp,
             balance: this.balance
-        };
+        }
     }
 }
