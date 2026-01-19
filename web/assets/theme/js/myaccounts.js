@@ -1,3 +1,11 @@
+/**FUNCIONES:
+
+fetchAccounts (); // Función para obtener las cuentas bancarias del servidor.
+userRowgenerator (); // Función para crear las filas en la tabla con los datos obetenidos del servidor.
+pageLoadHandler (); // Función que refresca la pagina y pinta la tabla con los datos actualizados.
+generateRandomAccountId (); // Función que genera un id aleatorio de cuenta.
+*/
+
 const SERVICE_URL = "/CRUDBankServerSide/webresources/account/customer/";
 const ACCOUNT_URL = "/CRUDBankServerSide/webresources/account/";
 
@@ -19,10 +27,10 @@ function* userRowGenerator(accounts) {
     for (const account of accounts) {
         const tr = document.createElement("tr");
 
-        ["id", "description", "balance", "creditLine", "beginBalanceTimestamp"].forEach(field => {
+        ["id", "description", "type", "creditLine","beginBalanceTimestamp", "beginBalance", "balance"].forEach(field => {
             const td = document.createElement("td");
-            if (field === "creditLine") {
-                td.textContent = account[field] > 0 ? "CREDIT" : "STANDARD";
+            if (field === "type") {
+                td.textContent = account[field] > 0 ? "STANDARD" : "CREDIT";
             } else {
                 td.textContent = account[field] !== undefined ? account[field] : "";
             }
@@ -38,6 +46,7 @@ function* userRowGenerator(accounts) {
             window.location.href = "mymovements.html";
         };
         tdAction.appendChild(btnVer);
+        
 
         const btnBorrar = document.createElement("button");
         btnBorrar.textContent = "Borrar";
@@ -149,7 +158,10 @@ async function pageLoadHandler() {
 }
 
 
+
 /**
+ * //Función para parsear datos en XML (NO NECESARIA YA UTILIZAMOS JSON)
+ */
 /*function parseUsersXML(xmlText) {
     const parser = new DOMParser();
     const xmlDoc = parser.parseFromString(xmlText, "application/xml");
