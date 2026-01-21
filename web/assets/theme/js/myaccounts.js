@@ -1,7 +1,6 @@
 /**FUNCIONES:
-
 fetchAccounts (); // Función para obtener las cuentas bancarias del servidor.
-userRowgenerator (); // Función para crear las filas en la tabla con los datos obetenidos del servidor.
+userRowgenerator (); // Función para crear las filas en la tabla con los datos obetenidos del servidor.(actualizada cpon el formato de fecha y moneda)
 pageLoadHandler (); // Función que refresca la pagina y pinta la tabla con los datos actualizados.
 generateRandomAccountId (); // Función que genera un id aleatorio de cuenta.
 */
@@ -9,156 +8,198 @@ generateRandomAccountId (); // Función que genera un id aleatorio de cuenta.
 const SERVICE_URL = "/CRUDBankServerSide/webresources/account/customer/";
 const ACCOUNT_URL = "/CRUDBankServerSide/webresources/account/";
 
-document.addEventListener("DOMContentLoaded", pageLoadHandler);
+document.addEventListener("DOMContentLoaded", () => {
+    pageLoadHandler();
 
-// 0. Obtener cuentas del servidor
-async function fetchAccounts() {
-    const customerId = sessionStorage.getItem("customer.id").replace(/[,.]/g, "");
-    const response = await fetch(SERVICE_URL + customerId, {
-        method: "GET",
-        headers: { "Accept": "application/json" }
-    });
-    if (!response.ok) throw new Error("Error al obtener cuentas");
-    return await response.json();
-}
+    const formLayer = document.getElementById("formLayer");
+    const formAccount = document.getElementById("formAccount");
+    const typeSelect = document.getElementById("type");
+    const creditContainer = document.getElementById("creditLineContainer");
+    const creditInput = document.getElementById("creditLineInput");
 
-// 1. Generador de filas para la tabla
-function* userRowGenerator(accounts) {
-    for (const account of accounts) {
-        const tr = document.createElement("tr");
-
-        ["id", "description", "type", "creditLine","beginBalanceTimestamp", "beginBalance", "balance"].forEach(field => {
-            const td = document.createElement("td");
-            if (field === "type") {
-                td.textContent = account[field] > 0 ? "STANDARD" : "CREDIT";
-            } else {
-                td.textContent = account[field] !== undefined ? account[field] : "";
-            }
-            tr.appendChild(td);
-        });
-
-        const tdAction = document.createElement("td");
-
-        const btnVer = document.createElement("button");
-        btnVer.textContent = "Movimientos";
-        btnVer.onclick = () => {
-            sessionStorage.setItem("account.id", account.id);
-            window.location.href = "mymovements.html";
-        };
-        tdAction.appendChild(btnVer);
-        
-
-        const btnBorrar = document.createElement("button");
-        btnBorrar.textContent = "Borrar";
-        btnBorrar.classList.add("btn-borrar");
-        btnBorrar.setAttribute("data-id", account.id);
-        btnBorrar.style.backgroundColor = "red";
-        btnBorrar.style.color = "white";
-        btnBorrar.style.marginLeft = "10px";
-        tdAction.appendChild(btnBorrar);
-
-        tr.appendChild(tdAction);
-        yield tr;
-    }
-}
-
-// 2. Función Principal
-async function pageLoadHandler() {
-    try {
-        const accounts = await fetchAccounts();
-        const tbody = document.querySelector("#tableBody");
-        tbody.innerHTML = "";
-
-        // --- DELEGACIÓN DE EVENTOS (BORRAR) CON VALIDACIÓN ---
-        tbody.onclick = async (event) => {
-            if (event.target.classList.contains("btn-borrar")) {
-                const id = event.target.getAttribute("data-id");
-                
-                // BUSCAR LA CUENTA PARA VALIDAR MOVIMIENTOS
-                const account = accounts.find(acc => acc.id == id);
-                if (account && account.movements && account.movements.length > 0) {
-                    alert("No se puede borrar una cuenta que tenga movimientos.");
-                    return;
-                }
-
-                if (confirm(`¿Eliminar cuenta ${id}?`)) {
-                    const res = await fetch(ACCOUNT_URL + id, { method: "DELETE" });
-                    if (res.ok) {
-                        pageLoadHandler();
-                    } else {
-                        alert("Error: No se puede borrar una cuenta con movimientos.");
-                    }
-                }
-            }
-        };
-
-        function generateRandomAccountId () { 
-            return Math.floor(Math.random() * 100000000); 
+    // Lógica para mostrar/ocultar y validar el campo Credit Line dinámicamente
+    typeSelect.addEventListener("change", () => {
+        if (typeSelect.value === "1000") {
+            creditContainer.style.display = "block";
+            creditInput.required = true;
+            creditInput.setAttribute("min", "50");
+        } else {
+            creditContainer.style.display = "none";
+            creditInput.required = false;
+            creditInput.value = "";
         }
+    });
 
-        const capa = document.querySelector(".crear-cuenta-container");
-        document.getElementById("btn-nueva-cuenta").onclick = () => capa.style.display = "flex";
-        document.querySelector(".btn-cancel").onclick = () => {
-            capa.style.display = "none";
-            document.getElementById("formAccount").reset();
-        };
+    // Abrir modal
+    document.getElementById("btnNuevaCuenta").onclick = () => {
+        formLayer.style.display = "flex";
+    };
 
-        // BOTÓN GUARDAR (POST) CON VALIDACIÓN DE SALDO
-        document.querySelector(".btn-save").onclick = async () => {
-            const balance = parseFloat(document.getElementById("balance").value);
-            const creditLine = parseFloat(document.getElementById("type").value);
+    // Cerrar modal
+    document.getElementById("btnClose").onclick = () => {
+        formLayer.style.display = "none";
+        formAccount.reset();
+        creditContainer.style.display = "none";
+    };
 
-            // VALIDACIÓN: NO PERMITIR SALDO NEGATIVO SI ES CUENTA CRÉDITO
-            if (creditLine > 0 && balance < 0) {
-                alert("Una cuenta de crédito no puede tener saldo negativo.");
+    // Envío del formulario con validaciones
+    formAccount.onsubmit = async (event) => {
+        event.preventDefault();
+
+        const balance = parseFloat(document.getElementById("balance").value);
+        let creditLineValue = 0;
+
+        // Validación estricta de Línea de Crédito
+        if (typeSelect.value === "1000") {
+            creditLineValue = parseFloat(creditInput.value);
+            if (isNaN(creditLineValue) || creditLineValue <= 0) {
+                alert("The credit line must be greater than 0.");
                 return;
             }
+        }
 
-            const custIdRaw = sessionStorage.getItem("customer.id");
-            const idLimpio = parseInt(custIdRaw.replace(/[,.]/g, ""));
-            
-            const nuevaCuenta = {
-                id: generateRandomAccountId(),
-                description: document.getElementById("description").value,
-                balance: balance,
-                creditLine: creditLine,
-                beginBalance: balance,
-                beginBalanceTimestamp: new Date().toISOString().split('.')[0] + "Z",
-                "customers": [
-                    { "id": idLimpio }
-                ]
-            };          
+        const custIdRaw = sessionStorage.getItem("customer.id");
+        if (!custIdRaw) {
+            alert("Session expired. Please log in again.");
+            window.location.href = "index.html";
+            return;
+        }
 
+        const idLimpio = parseInt(custIdRaw.replace(/[,.]/g, ""));
+
+        const nuevaCuenta = {
+            id: Math.floor(Math.random() * 100000000),
+            description: document.getElementById("description").value,
+            balance: balance,
+            creditLine: creditLineValue,
+            beginBalance: balance,
+            beginBalanceTimestamp: new Date().toISOString().split('.')[0] + "Z",
+            "customers": [{ "id": idLimpio }]
+        };
+
+        try {
             const response = await fetch(ACCOUNT_URL, {
                 method: "POST",
                 headers: { 
-                    "Content-Type": "application/json",
-                    "Accept": "application/json"
+                    "Content-Type": "application/json", 
+                    "Accept": "application/json" 
                 },
                 body: JSON.stringify(nuevaCuenta)
             });
 
             if (response.ok) {
-                capa.style.display = "none";
-                document.getElementById("formAccount").reset();
-                setTimeout(pageLoadHandler, 300); 
+                formLayer.style.display = "none";
+                formAccount.reset();
+                creditContainer.style.display = "none";
+                pageLoadHandler(); // Recargar tabla
             } else {
-                alert("Error al crear. Contacte al administrador.");
+                alert("Error creating account. Please try again.");
             }
+        } catch (error) {
+            console.error("Error en POST:", error);
+        }
+    };
+});
+
+// Función para obtener cuentas del servidor
+async function fetchAccounts() {
+    const customerId = sessionStorage.getItem("customer.id").replace(/[,.]/g, "");
+    const response = await fetch(`${SERVICE_URL}${customerId}?t=${new Date().getTime()}`, {
+        method: "GET",
+        headers: { "Accept": "application/json" }
+    });
+    return await response.json();
+}
+
+// Generador de filas para la tabla
+function* userRowGenerator(accounts) {
+    for (const account of accounts) {
+        const tr = document.createElement("tr");
+        
+        // Campos a mostrar en orden
+        const fields = ["id", "description", "type", "creditLine", "beginBalanceTimestamp", "beginBalance", "balance"];
+        
+        fields.forEach(field => {
+            const td = document.createElement("td");
+            let value = account[field];
+
+            if (field === "type") {
+                td.textContent = account.creditLine > 0 ? "CREDIT" : "STANDARD";
+            } 
+            else if (field === "beginBalanceTimestamp" && value) {
+                const date = new Date(value);
+                td.textContent = new Intl.DateTimeFormat("es-ES", { 
+                    day: "2-digit", month: "2-digit", year: "numeric",
+                    hour: "2-digit", minute: "2-digit", hour12: false
+                }).format(date);
+            }
+            else if (["creditLine", "beginBalance", "balance"].includes(field)) {
+                const number = parseFloat(value || 0);
+                td.textContent = new Intl.NumberFormat("es-ES", { 
+                    style: "currency", currency: "EUR" 
+                }).format(number);
+            }
+            else {
+                td.textContent = value !== undefined ? value : "";
+            }
+            tr.appendChild(td);
+        });
+
+        // Columna de Acciones
+        const tdAction = document.createElement("td");
+        
+        const btnVer = document.createElement("button");
+        btnVer.classList.add('movbutton');
+        btnVer.textContent = "Movements";
+        btnVer.onclick = () => {
+            sessionStorage.setItem("account.id", account.id);
+            sessionStorage.setItem("account.balance", account.balance);
+            sessionStorage.setItem("account.creditLine", account.creditLine);
+            window.location.href = "mymovements.html";
         };
 
+        const btnBorrar = document.createElement("button");
+        btnBorrar.classList.add('borbutton');
+        btnBorrar.textContent = "Delete";
+        btnBorrar.onclick = () => deleteAccount(account.id);
+        
+        tdAction.appendChild(btnVer);
+        tdAction.appendChild(btnBorrar);
+        tr.appendChild(tdAction);
+        
+        yield tr;
+    }
+}
+
+// Manejador de carga de página y actualización de tabla
+async function pageLoadHandler() {
+    try {
+        const accounts = await fetchAccounts();
+        const tbody = document.querySelector("#tableBody");
+        tbody.innerHTML = "";
+        
         const rowGenerator = userRowGenerator(accounts);
         for (const row of rowGenerator) {
             tbody.appendChild(row);
         }
-
     } catch (e) {
-        console.error("Error en la carga:", e);
+        console.error("Loading error:", e);
     }
 }
 
-
-
+// Función para borrar cuenta
+async function deleteAccount(id) {
+    if (confirm(`Are you sure you want to delete account ${id}?`)) {
+        try {
+            const res = await fetch(ACCOUNT_URL + id, { method: "DELETE" });
+            if (res.ok) {
+                pageLoadHandler();
+            }
+        } catch (error) {
+            console.error("Delete error:", error);
+        }
+    }
+}
 /**
  * //Función para parsear datos en XML (NO NECESARIA YA UTILIZAMOS JSON)
  */
