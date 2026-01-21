@@ -224,4 +224,5 @@ function updateAccountInfo() {
     }
 }
 /* COSAS A CAMBIAR PARA EL CORRECTO FUNCIONAMIENTO:
+ * Seguir mirando pruebas de movimientos y comprobar validaciones
 */
