@@ -23,7 +23,6 @@ function Customer(
     this.email = email;
     this.password = password;
 }
-
 // Función principal de sign in
 function handleSignInOnClick(event) {
     try {
@@ -55,7 +54,6 @@ function handleSignInOnClick(event) {
         msgBox.style.display = 'block';
     }
 }
-
 // Petición al servidor y procesamiento de respuesta XML
 function sendSignInRequestAndProcessResponse() {
     const signInForm = document.getElementById("signInForm");
