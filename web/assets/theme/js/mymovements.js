@@ -4,8 +4,6 @@
  */
 // ARRAY FECHAS CORRECTAS
 const isoRegex = /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}:\d{2})/;
-const date = new Date(Date.UTC(2020, 11, 20, 3, 23, 16, 738));
-console.log(new Intl.DateTimeFormat(["ban", "id"]).format(date));
 // PATH PARAM DEL SERVIDOR
 const SERVICE_URL = "/CRUDBankServerSide/webresources/movement/account/";
 // PATH PARAM del DELETE de MOVIMIENTOS.
@@ -77,16 +75,13 @@ function* userRowGenerator(movements) {
                     hour: "2-digit",
                     minute: "2-digit",
                     hour12: false
-                }).format(date); // dd/mm/yyyy hh:mm
+                }).format(date); // DD/MM/YYYY HH:MM
             }
             // FORMATEO MDN EN EUROS
             else if (field === "amount" || field === "balance") {
                 const number = parseFloat(value);
                 value = new Intl.NumberFormat("es-ES", { 
-                    style: "currency", 
-                    currency: "EUR",
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
+                    style: "currency", currency: "EUR"
                 }).format(number);
             }
             td.textContent = value;
@@ -122,6 +117,11 @@ async function createMovement(evt) {
         // SESSION STORAGE DEL ACCOUNT BALANCE Y CREDITLINE
         let currentBalance = parseFloat(sessionStorage.getItem("account.balance")) || 0;
         let amountValue = parseFloat(tfAmount.value);
+        // Validación: no permitir signos ni valores negativos
+        if (isNaN(amountValue) || amountValue < 0) {
+            alert("Introduce una cantidad válida, sin signos ni valores negativos.");
+        return;
+        }
         let creditLine = parseFloat(sessionStorage.getItem("account.creditLine")) || 0; // AÑADIDO
         // ELECCION DEPENDIENDO DEL RADIOBUTTON
         if (rbDeposit.checked){ 
@@ -211,18 +211,17 @@ async function deleteMovement() {
 //====================== FUNCIONES EXTRAS ==================================
 // FUNCION PARA ACTUALIZAR EL BALANCE Y EL ID DE LA CUENTA.
 function updateAccountInfo() {
-    const accountId = sessionStorage.getItem("account.id") || "Desconocido";
+    const accountId = sessionStorage.getItem("account.id") || "Unkown";
     const balance = parseFloat(sessionStorage.getItem("account.balance")) || 0;
-
     document.getElementById("accountIdText").textContent = accountId;
-
-    document.getElementById("accountBalanceText").textContent =
-        new Intl.NumberFormat("es-ES", {
+    
+    const balanceMov = document.getElementById("accountBalanceText");
+    if (balanceMov) {
+        balanceMov.textContent = new Intl.NumberFormat("es-ES", {
             style: "currency",
-            currency: "EUR",
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
+            currency: "EUR"
         }).format(balance);
+    }
 }
 /* COSAS A CAMBIAR PARA EL CORRECTO FUNCIONAMIENTO:
 */
