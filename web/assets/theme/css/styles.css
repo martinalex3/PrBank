@@ -6,16 +6,15 @@
     --blue-light: #1976d2;
     --soft-bg: #f4f7fb;
     --white: #ffffff;
+    --light-light-blue: #8AACC1
 }
 /*Son variables que una vez definidas, se pueden usar globalmente en las paginas web*/
-
 /* =========================
    ESTILOS GENERALES
    ========================= */
 * {
     box-sizing: border-box;
 }
-
 body {
     margin: 0;
     padding: 0;
@@ -26,7 +25,6 @@ body {
     flex-direction: column;
     min-height: 100vh;
 }
-
 /* =========================
    HEADER
    ========================= */
@@ -52,6 +50,32 @@ header {
     font-size: 2rem;
     font-weight: bold;
 }
+/* Texto clicable en la izquierda del header */
+.header-link {
+    position: absolute;
+    left: 25px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: white;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.header-link:hover {
+    opacity: 0.7;
+    text-decoration: underline;
+}
+/* Botones en header / contenedores fuera de .botones */
+.header-btn {
+    padding: 12px 20px;      /* mismo tamaño que otros botones */
+    font-size: 15px;
+    border-radius: 8px;
+    min-height: 44px;        /* fuerza la misma altura */
+    line-height: 1.2;        /* consistente */
+    cursor: pointer;
+}
 /* Cerrar sesión a la derecha */
 .logout-link {
     position: absolute;
@@ -62,12 +86,19 @@ header {
     font-size: 1rem;
     transition: opacity 0.2s ease;
 }
-
 .logout-link:hover {
     opacity: 0.7;
     text-decoration: underline;
 }
-
+.header-btn {
+    padding: 12px 20px;
+    font-size: 15px;
+    border-radius: 8px;
+    min-height: 44px;
+    line-height: 1.2;
+    cursor: pointer;
+    min-width: 180px; /* fuerza ancho uniforme */
+}
 /* =========================
    MENSAJE DE BIENVENIDA
    ========================= */
@@ -76,20 +107,34 @@ header {
     margin-top: 30px;
     padding: 0 20px;
 }
-
 .bienvenida h2 {
     color: var(--blue-dark);
     margin: 0;
     font-size: 1.8rem;
 }
-
 .bienvenida p {
     margin-top: 8px;
     color: #333;
     font-size: 1.1rem;
 }
-
 /* =========================
+   INFO CUENTA (ID + BALANCE)
+   ========================= */
+.account-info {
+    display: flex;
+    justify-content: center;   /* centra todo el bloque */
+    align-items: center;
+    gap: 40px;                 /* espacio entre ID y balance */
+    margin-bottom: 20px;
+    font-weight: bold;
+    color: var(--blue-dark);
+    font-size: 1.05rem;
+}
+.account-id,
+.account-balance {
+    text-align: center;
+}
+/*=====================
    CONTENEDOR CENTRAL
    ========================= */
 .contenedor-central {
@@ -97,7 +142,6 @@ header {
     justify-content: center;
     margin: 40px 0;
 }
-
 .recuadro-principal {
     background: var(--white);
     padding: 30px;
@@ -106,8 +150,8 @@ header {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
+    
 }
-
 /* =========================
    TARJETAS DEL INDEX
    ========================= */
@@ -118,7 +162,6 @@ header {
     align-items: center;
     flex-wrap: wrap;
 }
-
 .card {
     width: 400px;
     height: 430px;
@@ -133,25 +176,41 @@ header {
     transition: transform 0.22s ease, box-shadow 0.22s ease;
     border: 1px solid rgba(13,71,161,0.06);
 }
-
 .card:hover {
     transform: translateY(-8px) scale(1.02);
     box-shadow: 0 18px 40px rgba(13,71,161,0.14);
 }
-
 .card img {
     max-width: 140px;
     max-height: 120px;
     margin-bottom: 18px;
     object-fit: contain;
 }
-
 .card-title {
     font-weight: bold;
     color: var(--blue-dark);
     font-size: 1.15rem;
 }
-
+/* =========================
+   ENCABEZADOS DE LA TABLA
+============================ */
+.tabla-bancaria th {
+    text-align: center;          /* Todos los títulos centrados */
+    color: var(--blue-dark);     /* Color azul */
+    font-weight: bold;
+    padding: 10px;
+}
+/* =========================
+   CELDAS DE DATOS
+============================ */
+.tabla-bancaria td {
+    padding: 10px;
+}
+/* Solo Amount y Balance a la derecha */
+.tabla-bancaria td:nth-child(3),
+.tabla-bancaria td:nth-child(4) {
+    text-align: right !important;  /* !important fuerza que se aplique */
+}
 /* =========================
    FORMULARIO SIGN-IN
    ========================= */
@@ -159,12 +218,10 @@ header {
     width: 350px;
     text-align: center;
 }
-
 .recuadro-formulario h3 {
     color: var(--blue-dark);
     margin-bottom: 20px;
 }
-
 #tfEmail, #tfPassword {
     width: 100%;
     padding: 12px;
@@ -172,14 +229,12 @@ header {
     border: 1px solid var(--blue-dark);
     border-radius: 8px;
 }
-
 .botones {
     display: flex;
     flex-direction: column;
     gap: 10px;
     margin-top: 10px;
 }
-
 .botones button {
     padding: 12px;
     border-radius: 8px;
@@ -189,27 +244,21 @@ header {
     cursor: pointer;
     transition: background 0.2s ease;
 }
-
 .iniciar {
     background-color: var(--blue-dark);
 }
-
 .iniciar:hover {
     background-color: #002266;
 }
-
 .cancelar {
     background-color: #666666;
 }
-
 .cancelar:hover {
     background-color: #444444;
 }
-
 .volver {
     background-color: #cc0000;
 }
-
 .volver:hover {
     background-color: #990000;
 }
@@ -275,7 +324,74 @@ footer {
     align-items: center;
     z-index: 100;
 }
-
+/* Botón en la izquierda del header */
+.header-left-btn {
+    position: absolute;
+    left: 25px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+/* BOTÓN NEW MOVEMENT */
+.btn-new-movement {
+    background-color: var(--blue-dark); /* azul oscuro */
+    color: white;                       /* letras blancas */
+    border: none;
+}
+.btn-new-movement:hover {
+    background-color: #002266;          /* azul más intenso al pasar el mouse */
+}
+/* BOTÓN UNDO LAST MOVEMENT */
+.btn-undo {
+    background-color: white;             /* fondo blanco */
+    color: var(--blue-dark);             /* letras azul oscuro */
+    border: 2px solid var(--blue-dark); /* borde azul oscuro */
+}
+btn-undo:hover {
+    background-color: var(--blue-light); /* azul clarito al pasar el mouse */
+    color: white;                        /* letras blancas en hover */
+    border-color: var(--blue-dark);      /* mantiene el borde azul */
+}
+/*==========================
+   FILAS DE LAS TABLAS
+============================*/
+.tabla-bancaria tbody tr:nth-child(odd) {
+    background-color: var(--blue-dark); /* azul oscuro */
+    color: white;                       /* letras blancas */
+}
+.tabla-bancaria tbody tr:nth-child(even) {
+    background-color: white;            /* fondo blanco */
+    color: var(--blue-dark);            /* letras azul oscuro */
+    border: 2px solid var(--blue-dark); /* contorno azul */
+}
+/* Hover general para ambas filas */
+.tabla-bancaria tbody tr:hover {
+    background-color: var(--light-light-blue); /* azul clarito al pasar el mouse */
+    color: white;                        /* letras blancas al hover */
+}
+/*==========================
+   ALINEAR AMOUNT Y BALANCE
+============================*/
+.tabla-bancaria td:nth-child(3),
+.tabla-bancaria td:nth-child(4),
+.tabla-bancaria th:nth-child(3),
+.tabla-bancaria th:nth-child(4) {
+    text-align: right; /* alinea contenido a la derecha */
+    padding-right: 12px;
+}
+/* =========================
+   FOOTER
+   ========================= */
+    .help-link {
+    color: var(--blue-dark);
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: opacity 0.2s ease, text-decoration 0.2s ease;
+    }
+    .help-link:hover {
+    opacity: 0.7;
+    text-decoration: underline;
+    }
 /* =========================
    RESPONSIVE
    ========================= */
@@ -283,15 +399,9 @@ footer {
     .card { width: 220px; height: 260px; }
     .menu-container { gap: 20px; }
 }
-
 @media (max-width: 520px) {
     .recuadro-principal { padding: 18px; }
     .menu-container { flex-direction: column; gap: 16px; align-items:center; }
     header h1 { font-size: 1.5rem; }
     .bienvenida h2 { font-size: 1.3rem; }
 }
-
-
-
-
-
