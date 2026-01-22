@@ -46,7 +46,7 @@
                 <!-- BOTÓN CREAR A LA IZQUIERDA -->
                 <div style="text-align: left; width: 100%; margin-bottom: 15px;">
                     <button id="btnOpen" class="btn-new-movement header-btn">
-                        New Movement
+                        New Movement...
                     </button>
                 </div>
                 <!-- TABLA -->
@@ -61,10 +61,14 @@
                     </thead>
                     <tbody id="tableBody"></tbody>
                 </table>
+                <!-- TEXTO BALANCE DESTACADO -->
+                <div class="balance-highlight">
+                    Your Current Balance is: <span id="accountBalanceBottom"></span>
+                </div>
                 <!-- BOTÓN DESHACER CENTRADO -->
                 <div style="text-align: center; margin-top: 20px;">
                     <button id="btnUndo" class="btn-undo header-btn">
-                        Undo Last Movement
+                        Undo Last Movement...
                     </button>
                 </div>
             </div>
@@ -126,5 +130,10 @@
             window.location.href = "mymovhelp.html";
         }
     </script>
-</body>
+    <!-- FOOTER -->
+    <footer>
+        <p>© 2026 PrBank. All Rights Reserved.</p>
+        <p>Alejandro Martín, Kenneth León, David Aranda.</p>
+    </footer>
+   </body>
 </html>

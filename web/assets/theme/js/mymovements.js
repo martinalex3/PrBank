@@ -2,41 +2,43 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-// ARRAY FECHAS CORRECTAS
+// ======================== CONSTANTES Y VARIABLES GLOBALES ====================
+// ARRAY FECHAS CORRECTAS 
 const isoRegex = /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}:\d{2})/;
-// PATH PARAM DEL SERVIDOR
+// PATH PARAM DEL SERVIDOR PARA OBTENER MOVIMIENTOS POR CUENTA
 const SERVICE_URL = "/CRUDBankServerSide/webresources/movement/account/";
-// PATH PARAM del DELETE de MOVIMIENTOS.
+// PATH PARAM DEL DELETE DE MOVIMIENTOS (BORRADO POR ID)
 const SERVICE_DEL_URL = "/CRUDBankServerSide/webresources/movement/";
-// NUEVA URL PARA ACTUALIZAR LA CUENTA (AÑADIDO)
+// PATH PARAM PARA ACTUALIZACION DE CUENTA (TABLA ACCOUNT)
 const ACCOUNT_URL = "/CRUDBankServerSide/webresources/account/";
-// ARRAY GLOBAL MOVEMENTS
+// ARRAY GLOBAL DONDE SE GUARDAN LOS MOVIMIENTOS RECUPERADOS DEL SERVIDOR
 let movements = [];
-// LINEA DOM
+// ====================== DOM CONTENT LOADED ============================
+// EJECUCION CUANDO EL HTML SE EJECUTA POR COMPLETO
 document.addEventListener("DOMContentLoaded", () => {
-    // Actualizar saldo de la cuenta
+    // ACTUALIZA EL ID Y EL BALANCE AL CARGAR LA PAGINA
     updateAccountInfo();
-    // Mostrar el ID de la cuenta
+    // MUESTRA EL ID DE LA CUENTA
     const accountId = sessionStorage.getItem("account.id") || "Unknown";
     document.getElementById("accountIdText").textContent = accountId;
     // CONSTRUIR TABLA
     buildMovementsTable();
-    // ABRIR FORMULARIO
+    // ABRIR FORMULARIO NEW MOVEMENT
     document.getElementById("btnOpen").addEventListener("click", () => {
         document.getElementById("formLayer").style.display = "flex";
     });
-    // CERRAR FORMULARIO
+    // CERRAR FORMULARIO NEW MOVEMENT
     document.getElementById("btnClose").addEventListener("click", () => {
         document.getElementById("formLayer").style.display = "none";
     });
-    // ENVIAR FORMULARIO
+    // ENVIAR FORMULARIO Y CREA NEW MOVEMENT
     document.getElementById("formAccount").addEventListener("submit", createMovement);
     // BOTON UNDO: CON MENSAJE DE CONFIRMACION
     document.getElementById("btnUndo").addEventListener("click", () => {
         if (movements.length > 0) {
             document.getElementById("confirmLayer").style.display = "flex";
         } else {
-            alert("No hay movimientos para borrar");
+            alert("There are no moves to delete");
         }
     });
     // BOTON SI, BORRAR (Dentro del confirmLayer)
@@ -49,6 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("confirmLayer").style.display = "none"; // CERRAMOS SIN REALIZAR BORRADO
     });
 });
+// ========================= FETCH MOVIMIENTOS =======================
 // LEER TABLAS EN EL SERVIDOR (cRud)
 // FETCH MOVEMENTS IN JSON FORMAT
 async function fetchMovements() {
@@ -58,6 +61,7 @@ async function fetchMovements() {
     });
     return await response.json();
 }
+// ============= GENERADOR DE FILAS DE TABLA =======================
 // GENERACION DE TABLAS CON FECHAS FORMATEADAS
 function* userRowGenerator(movements) {
     for (const movement of movements) {
@@ -90,39 +94,45 @@ function* userRowGenerator(movements) {
         yield tr;
     }
 }
+// ====================== TABLA DE MOVIMIENTOS ==================
 // FUNCION PARA CREAR TABLAS DE MOVIMIENTOS
 async function buildMovementsTable() {
     movements = await fetchMovements();
     const tbody = document.querySelector("#tableBody");
     tbody.innerHTML = ""; 
+    // ACTUALIZA EL BALANCE SEGUN EL ULTIMO MOVIMIENTO
     if (movements && movements.length > 0) {
         const lastMovement = movements[movements.length - 1];
         sessionStorage.setItem("account.balance", lastMovement.balance);
     }
+    // INSERCION DE FILAS EN LA TABLA
     const rowGenerator = userRowGenerator(movements);
     for (const row of rowGenerator) {
         tbody.appendChild(row);
     }
+    // ACTUALIZA LOS DASTOS DE LA CUENTA EN PANTALLA - AL MAS RECIENTE
     updateAccountInfo();
 }
+// =================== CREACION DE MOVIMIENTOS ====================
 // CREACIÓN DE MOVIMIENTOS (Crud)
 async function createMovement(evt) {
     evt.preventDefault(); 
     try {
         const tfAmount = document.getElementById("tfAmount");
         const rbDeposit = document.getElementById("rbDeposit");
-        //  MIRAR QUE TIPO DE MOVIMIENTO HA SIDO SELECCIONADO
+        //  VARIABLES PARA DEFINIR EL MOVIMIENTO
         let description;
         let balance;
-        // SESSION STORAGE DEL ACCOUNT BALANCE Y CREDITLINE
+        // BALANCE ACTUAL DE LA CUENTA
         let currentBalance = parseFloat(sessionStorage.getItem("account.balance")) || 0;
         let amountValue = parseFloat(tfAmount.value);
-        // Validación: no permitir signos ni valores negativos
+        // VALIDACION: NO PERMITE SIGNOS NI NUMEROS NEGATIVOS
         if (isNaN(amountValue) || amountValue < 0) {
-            alert("Introduce una cantidad válida, sin signos ni valores negativos.");
+            alert("Please, enter a valid amount, without negative signs or values..");
         return;
         }
-        let creditLine = parseFloat(sessionStorage.getItem("account.creditLine")) || 0; // AÑADIDO
+        // LINEA PARA COGER CORRECTAMENTE EL CREDITLINE DE CUENTAS
+        let creditLine = parseFloat(sessionStorage.getItem("account.creditLine")) || 0;
         // ELECCION DEPENDIENDO DEL RADIOBUTTON
         if (rbDeposit.checked){ 
             description = "Deposit";
@@ -133,7 +143,7 @@ async function createMovement(evt) {
             
             // VALIDACIÓN DE CRÉDITO
             if (balance < -creditLine) {
-                alert(`Operación denegada. Límite de crédito excedido. Su límite es de -${creditLine}€`);
+                alert(`Transaction denied. Credit limit exceeded. Your limit is -${creditLine}€`);
                 return;
             }
         }
@@ -154,24 +164,25 @@ async function createMovement(evt) {
             },
             body: JSON.stringify(newMovement)
         });
-
-        if (!response.ok) throw new Error("Error en servidor");
-
+        // EN CASO DE ERROR
+        if (!response.ok) throw new Error("Server Failed");
         // SINCRONIZACIÓN CON ACCOUNTS
         await syncAccountBalance(balance);
+        // GUARDAMOS EL NUEVO BALANCE EN SESSIONSTORAGE
         sessionStorage.setItem("account.balance", balance);
         updateAccountInfo();
         // SE LIMPIA LA TALA Y SE RECARGA
         document.querySelector("#tableBody").innerHTML = "";
         await buildMovementsTable();        
-
+        // SE CIERRA Y SE LIMPIA EL FORMULARIO
         document.getElementById("formLayer").style.display = "none";
         document.getElementById("formAccount").reset();
     } catch (error) {
         console.error("ERROR:", error);
     }
 }
-// FUNCIÓN PARA SINCRONIZAR CON LA TABLA DE ACCOUNTS (crUd)
+// ============= SINCRONIZACION DE CUENTA ====================
+// ACTUALIZA EL BALANCE DE LA CUENTA EN EL SERVIDOR
 async function syncAccountBalance(newBalance) {
     const accId = sessionStorage.getItem("account.id");
     try {
@@ -185,10 +196,10 @@ async function syncAccountBalance(newBalance) {
             body: JSON.stringify(accountData)
         });
     } catch (e) {
-        console.error("Error sincronizando balance:", e);
+        console.error("Error synchronizing balance:", e);
     }
 }
-// BORRADO DE MOVIMIENTOS (cruD)
+// ===================== BORRADO DE MOVIMIENTOS ====================
 // FETCH CON DELETE PARA BOORADO DE MOVIMIENTOS
 async function deleteMovement() {
     // OBTENEMOS EL ID DEL ULTIMO MOVIMIENTO
@@ -205,7 +216,7 @@ async function deleteMovement() {
         const recoveredBalance = parseFloat(sessionStorage.getItem("account.balance"));
         await syncAccountBalance(recoveredBalance);
     } else {
-        console.error("No se pudo eliminar el movimiento");
+        console.error("The movement could not be deleted");
     }
 }
 //====================== FUNCIONES EXTRAS ==================================
@@ -214,13 +225,19 @@ function updateAccountInfo() {
     const accountId = sessionStorage.getItem("account.id") || "Unkown";
     const balance = parseFloat(sessionStorage.getItem("account.balance")) || 0;
     document.getElementById("accountIdText").textContent = accountId;
-    
-    const balanceMov = document.getElementById("accountBalanceText");
-    if (balanceMov) {
-        balanceMov.textContent = new Intl.NumberFormat("es-ES", {
-            style: "currency",
-            currency: "EUR"
-        }).format(balance);
+    const formattedBalance = new Intl.NumberFormat("es-ES", {
+        style: "currency",
+        currency: "EUR"
+    }).format(balance);
+    // BALANCE SUPERIOR
+    const balanceTop = document.getElementById("accountBalanceText");
+    if (balanceTop) {
+        balanceTop.textContent = formattedBalance;
+    }
+    // BALANCE INFERIOR
+    const balanceBottom = document.getElementById("accountBalanceBottom");
+    if (balanceBottom) {
+        balanceBottom.textContent = formattedBalance;
     }
 }
 /* COSAS A CAMBIAR PARA EL CORRECTO FUNCIONAMIENTO:
