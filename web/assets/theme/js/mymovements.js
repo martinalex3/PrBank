@@ -1,6 +1,5 @@
-/* * To change this license header, choose License Headers in Project Properties.
+/* * To change this license header, choose License Headers in Project Properties
  * To change this template file, choose Tools | Templates
- * and open the template in the editor.
  */
 // ======================== CONSTANTES Y VARIABLES GLOBALES ====================
 // ARRAY FECHAS CORRECTAS 
@@ -16,6 +15,10 @@ let movements = [];
 // ====================== DOM CONTENT LOADED ============================
 // EJECUCION CUANDO EL HTML SE EJECUTA POR COMPLETO
 document.addEventListener("DOMContentLoaded", () => {
+    // GUARDAR EL BALANCE INICIAL DE LA CUENTA
+    const initialBalance = parseFloat(sessionStorage.getItem("account.balance")) || 0;
+    sessionStorage.setItem("account.initialBalance", initialBalance);
+
     // ACTUALIZA EL ID Y EL BALANCE AL CARGAR LA PAGINA
     updateAccountInfo();
     // MUESTRA EL ID DE LA CUENTA
@@ -209,12 +212,27 @@ async function deleteMovement() {
     });
 
     if (response.ok) {
+        // REMOVER EL ULTIMO MOVIMIENTO DEL ARRAY
+        movements.pop();
+        
+        // DETERMINAR EL NUEVO BALANCE
+        let newBalance;
+        if (movements.length === 0) {
+            // SI NO QUEDAN MOVIMIENTOS, RESTAURAR BALANCE INICIAL
+            newBalance = parseFloat(sessionStorage.getItem("account.initialBalance")) || 0;
+        } else {
+            // SI QUEDAN MOVIMIENTOS, TOMAR EL BALANCE DEL ULTIMO
+            newBalance = movements[movements.length - 1].balance;
+        }
+
+        // ACTUALIZAR SESSIONSTORAGE Y SERVIDOR
+        sessionStorage.setItem("account.balance", newBalance);
+        await syncAccountBalance(newBalance);
+
+        // RECONSTRUIR TABLA Y ACTUALIZAR INFO
         document.querySelector("#tableBody").innerHTML = "";
         await buildMovementsTable();
         updateAccountInfo();
-        // SINCRONIZACIÓN TRAS BORRAR
-        const recoveredBalance = parseFloat(sessionStorage.getItem("account.balance"));
-        await syncAccountBalance(recoveredBalance);
     } else {
         console.error("The movement could not be deleted");
     }

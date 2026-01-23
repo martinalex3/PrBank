@@ -99,6 +99,83 @@ header {
     min-width: 180px; /* fuerza ancho uniforme */
 }
 /* =========================
+   ACCESIBILIDAD (MUY IMPORTANTE))
+   ========================= */
+/*HE PUESTO UN COLOR NARANJA EN LA ACCESIBILIDAD PARA QUE SE VEA DONDE ESTÁ
+SITUADO EL TABULADOR EN ESE MOMENTO*/
+a:focus,
+button:focus {
+    outline: 3px solid #FFD700;
+    outline-offset: 3px;
+}
+/* ================== ESTILOS ACCESIBLES ================== */
+
+/* DESTACAR ENLACES */
+a.header-link, a.logout-link, a.help-link {
+    text-decoration: underline;
+    color: #ffbf47;
+}
+a.header-link:focus, a.logout-link:focus, a.help-link:focus {
+    outline: 3px solid #ffbf47;
+    outline-offset: 2px;
+}
+
+/* BOTONES ACCESIBLES */
+button {
+    cursor: pointer;
+    padding: 8px 12px;
+    font-size: 1rem;
+}
+button:focus {
+    outline: 3px solid #ffbf47;
+    outline-offset: 2px;
+}
+
+/* MODALES Y CAPAS OVERLAY */
+.capa-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* SR-ONLY (para etiquetas ocultas visualmente pero accesibles) */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    border: 0;
+}
+
+/*==========================
+       AÑADIR AL CSS
+========================== */
+/* BOTONES COMO BOTONES */
+.header-link, .logout-link, .help-link {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--white);
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+/* FOCO VISUAL PARA TODOS LOS BOTONES Y ENLACES */
+button:focus, .header-link:focus, .logout-link:focus, .help-link:focus {
+    outline: 3px solid #1976d2;
+    outline-offset: 2px;
+}
+/* =========================
    MENSAJE DE BIENVENIDA
    ========================= */
 .bienvenida {
