@@ -17,21 +17,30 @@ and open the template in the editor.
 <body>
 
     <header class="header-bar">
+        <nav role="navigation" aria-label="main navigation">
         <div class="header-content">
             <h1>PrBank</h1>
-            <span class="header-link" onclick="goHome()" style="cursor:pointer;">Main Index</span>
+            <button class="header-link" onclick="goHome()">Return to Index</button>
             <div class="header-actions">
-                <span class="logout-link" onclick="logout()" style="cursor:pointer;">Sign Out</span>
+                <button class="logout-link" onclick="logout()">Sign Out</button>
             </div>
         </div>
     </header>
+    
+    <div style="text-align: right; margin-top: 30px; margin-right: 20px;">
+        <button class="help-link" onclick="needHelp()">Need Help?</button>
+    </div>
 
     <section class="bienvenida">
         <h2>Welcome to your accounts</h2>
         <p>Manage your accounts securely.</p>
     </section>
-
+     
     <main>
+        <div class="total-balance" style="padding: 20px; text-align: right; font-size: 1.2em;">
+            <strong>Global balance: </strong> <span id="totalBalanceTop">0,00 €</span>
+        </div>
+                
         <div class="contenedor-central">
             <div class="recuadro-principal" style="width: 100%; flex-direction: column;">
                 
@@ -41,27 +50,31 @@ and open the template in the editor.
                     </button>
                 </div>
 
-                <table class="tabla-bancaria">
+                <table class="tabla-bancaria" role ="table" aria-label="Accounts Table">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Description</th>
-                            <th>Type</th>
-                            <th>Credit Line</th>
-                            <th>Timestamp</th>
-                            <th>Begin Balance</th>
-                            <th>Balance</th>
-                            <th>Actions</th>
+                            <th scope="col">ID</th>
+                            <th scope="col">Description</th>
+                            <th scope="col">Type</th>
+                            <th scope="col">Credit Line</th>
+                            <th scope="col">Timestamp</th>
+                            <th scope="col">Begin Balance</th>
+                            <th scope="col">Balance</th>
+                            <th scope="col">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody"></tbody>
                 </table>
+
+                <div class="total-balance" style="padding: 20px; text-align: right; font-size: 1.2em;">
+                    <strong>Global balance: </strong> <span id="totalBalanceBottom">0,00 €</span>
+                </div>
             </div>
         </div>
 
-        <div id="formLayer" class="capa-overlay" style="display:none;">
+        <div id="formLayer" class="capa-overlay" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="newaccountTitle">
             <div class="recuadro-principal" style="max-width: 420px;">
-                <h3>Create new account</h3>
+                <h3 id="newaccountTitle">Create new account</h3>
                 <form id="formAccount">
                     <input type="text" id="description" placeholder="Account description" required style="width:100%; margin-bottom:12px; padding:10px;">
                     <input type="number" id="balance" placeholder="Initial balance" required style="width:100%; margin-bottom:12px; padding:10px;">
@@ -83,13 +96,15 @@ and open the template in the editor.
     </main>
 
     <script>
-        function goHome() {
-            window.location.href = "index.html";
-        }
-        function logout() {
-            sessionStorage.clear();
-            window.location.href = "index.html";
-        }
+        function goHome() { window.location.href = "index.html"; }
+        function logout() { sessionStorage.clear(); window.location.href = "index.html"; }
+        function needHelp() { window.location.href = "myacchelp.html"; }
     </script>
+    
+    <footer>
+        <p>© 2026 PrBank. All Rights Reserved.</p>
+        <p>Alejandro Martín, Kenneth León, David Aranda.</p>
+    </footer>
+    
 </body>
 </html>

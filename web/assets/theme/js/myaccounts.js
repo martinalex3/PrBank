@@ -17,7 +17,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const creditContainer = document.getElementById("creditLineContainer");
     const creditInput = document.getElementById("creditLineInput");
 
-    // Lógica para mostrar/ocultar y validar el campo Credit Line dinámicamente
     typeSelect.addEventListener("change", () => {
         if (typeSelect.value === "1000") {
             creditContainer.style.display = "block";
@@ -30,26 +29,21 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Abrir modal
     document.getElementById("btnNuevaCuenta").onclick = () => {
         formLayer.style.display = "flex";
     };
 
-    // Cerrar modal
     document.getElementById("btnClose").onclick = () => {
         formLayer.style.display = "none";
         formAccount.reset();
         creditContainer.style.display = "none";
     };
 
-    // Envío del formulario con validaciones
     formAccount.onsubmit = async (event) => {
         event.preventDefault();
-
         const balance = parseFloat(document.getElementById("balance").value);
         let creditLineValue = 0;
 
-        // Validación estricta de Línea de Crédito
         if (typeSelect.value === "1000") {
             creditLineValue = parseFloat(creditInput.value);
             if (isNaN(creditLineValue) || creditLineValue <= 0) {
@@ -91,9 +85,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 formLayer.style.display = "none";
                 formAccount.reset();
                 creditContainer.style.display = "none";
-                pageLoadHandler(); // Recargar tabla
+                pageLoadHandler();
             } else {
-                alert("Error creating account. Please try again.");
+                alert("Error creating account.");
             }
         } catch (error) {
             console.error("Error en POST:", error);
@@ -101,7 +95,6 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 });
 
-// Función para obtener cuentas del servidor
 async function fetchAccounts() {
     const customerId = sessionStorage.getItem("customer.id").replace(/[,.]/g, "");
     const response = await fetch(`${SERVICE_URL}${customerId}?t=${new Date().getTime()}`, {
@@ -111,12 +104,9 @@ async function fetchAccounts() {
     return await response.json();
 }
 
-// Generador de filas para la tabla
 function* userRowGenerator(accounts) {
     for (const account of accounts) {
         const tr = document.createElement("tr");
-        
-        // Campos a mostrar en orden
         const fields = ["id", "description", "type", "creditLine", "beginBalanceTimestamp", "beginBalance", "balance"];
         
         fields.forEach(field => {
@@ -145,9 +135,7 @@ function* userRowGenerator(accounts) {
             tr.appendChild(td);
         });
 
-        // Columna de Acciones
         const tdAction = document.createElement("td");
-        
         const btnVer = document.createElement("button");
         btnVer.classList.add('movbutton');
         btnVer.textContent = "Movements";
@@ -166,15 +154,17 @@ function* userRowGenerator(accounts) {
         tdAction.appendChild(btnVer);
         tdAction.appendChild(btnBorrar);
         tr.appendChild(tdAction);
-        
         yield tr;
     }
 }
 
-// Manejador de carga de página y actualización de tabla
 async function pageLoadHandler() {
     try {
         const accounts = await fetchAccounts();
+        
+        // CORRECCIÓN: Pasar el array accounts a la función de balance
+        totalBalanceAccounts(accounts); 
+
         const tbody = document.querySelector("#tableBody");
         tbody.innerHTML = "";
         
@@ -187,7 +177,6 @@ async function pageLoadHandler() {
     }
 }
 
-// Función para borrar cuenta
 async function deleteAccount(id) {
     if (confirm(`Are you sure you want to delete account ${id}?`)) {
         try {
@@ -199,6 +188,24 @@ async function deleteAccount(id) {
             console.error("Delete error:", error);
         }
     }
+}
+
+// CORRECCIÓN: Función agregada con reduce corregido
+function totalBalanceAccounts(accounts) {
+    const totalBalance = accounts.reduce((acumulador, cuenta) => {
+        return acumulador + (parseFloat(cuenta.balance) || 0);
+    }, 0);
+
+    const formateador = new Intl.NumberFormat("es-ES", {
+        style: "currency",
+        currency: "EUR"
+    }).format(totalBalance);
+    
+    const txtTop = document.getElementById("totalBalanceTop");
+    const txtBottom = document.getElementById("totalBalanceBottom");
+    
+    if (txtTop) txtTop.textContent = formateador;
+    if (txtBottom) txtBottom.textContent = formateador;
 }
 /**
  * //Función para parsear datos en XML (NO NECESARIA YA UTILIZAMOS JSON)
