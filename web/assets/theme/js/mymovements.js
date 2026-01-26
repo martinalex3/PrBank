@@ -18,12 +18,29 @@ document.addEventListener("DOMContentLoaded", () => {
     // GUARDAR EL BALANCE INICIAL DE LA CUENTA
     const initialBalance = parseFloat(sessionStorage.getItem("account.balance")) || 0;
     sessionStorage.setItem("account.initialBalance", initialBalance);
-
     // ACTUALIZA EL ID Y EL BALANCE AL CARGAR LA PAGINA
     updateAccountInfo();
     // MUESTRA EL ID DE LA CUENTA
     const accountId = sessionStorage.getItem("account.id") || "Unknown";
     document.getElementById("accountIdText").textContent = accountId;
+    // MUESTRA EL CREDIT LINE DE LA CUENTA
+    const creditLineRaw = sessionStorage.getItem("account.creditLine");
+    const creditLine = parseFloat(creditLineRaw);
+    // CREAMOS EL NUEVO ARRAY PARA EL CREDITTEXT
+    const creditText = document.getElementById("accountCreditText");
+    // SI NO TIENE LINEA DE CREDITO (STANDARD)
+    if (!creditLineRaw || isNaN(creditLine) || creditLine === 0) {
+        creditText.textContent = "This account has no credit line (Standard)";
+    } 
+    // SI TIENE LINEA DE CREDITO
+    else {
+        creditText.textContent = new Intl.NumberFormat("es-ES", {
+            style: "currency",
+            currency: "EUR",
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }).format(creditLine);
+    }
     // CONSTRUIR TABLA
     buildMovementsTable();
     // ABRIR FORMULARIO NEW MOVEMENT

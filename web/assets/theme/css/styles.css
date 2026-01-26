@@ -62,6 +62,7 @@ header {
     cursor: pointer;
     transition: opacity 0.2s ease;
 }
+
 .header-link:hover {
     opacity: 0.7;
     text-decoration: underline;
@@ -96,18 +97,12 @@ header {
     min-height: 44px;
     line-height: 1.2;
     cursor: pointer;
-    min-width: 180px; /* fuerza ancho uniforme */
+    min-width: 180px; /* fuerza ancho uniforme */   
+    
 }
 /* =========================
    ACCESIBILIDAD (MUY IMPORTANTE))
    ========================= */
-/*HE PUESTO UN COLOR NARANJA EN LA ACCESIBILIDAD PARA QUE SE VEA DONDE ESTÁ
-SITUADO EL TABULADOR EN ESE MOMENTO*/
-a:focus,
-button:focus {
-    outline: 3px solid #FFD700;
-    outline-offset: 3px;
-}
 /* ================== ESTILOS ACCESIBLES ================== */
 
 /* DESTACAR ENLACES */
@@ -119,7 +114,6 @@ a.header-link:focus, a.logout-link:focus, a.help-link:focus {
     outline: 3px solid #ffbf47;
     outline-offset: 2px;
 }
-
 /* BOTONES ACCESIBLES */
 button {
     cursor: pointer;
@@ -130,7 +124,6 @@ button:focus {
     outline: 3px solid #ffbf47;
     outline-offset: 2px;
 }
-
 /* MODALES Y CAPAS OVERLAY */
 .capa-overlay {
     position: fixed;
@@ -156,11 +149,6 @@ button:focus {
     clip: rect(0,0,0,0);
     border: 0;
 }
-
-/*==========================
-       AÑADIR AL CSS
-========================== */
-/* BOTONES COMO BOTONES */
 .header-link, .logout-link, .help-link {
     background: none;
     border: none;
@@ -203,20 +191,6 @@ button:focus, .header-link:focus, .logout-link:focus, .help-link:focus {
     align-items: center;
     margin: 40px 0;
 }
-/* CARD BLANCA */
-.help-card {
-    background-color: #ffffff;
-    width: 80%;
-    max-width: 800px;
-    min-height: 350px;
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-    
-    /* Para centrar contenido interno (cuando pongas el vídeo) */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
 /* =========================
    INFO CUENTA (ID + BALANCE)
    ========================= */
@@ -242,7 +216,23 @@ button:focus, .header-link:focus, .logout-link:focus, .help-link:focus {
     font-size: 1.3rem;
     color: var(--blue-dark);
 }
-/*=====================
+/* =========================
+   INFO CUSTOMER (ID + BALANCE)
+   ========================= */
+.total-balance {
+    display: flex;
+    justify-content: center;   /* centra todo el bloque */
+    align-items: right;
+    gap: 40px;                 /* espacio entre ID y balance */
+    margin-bottom: 20px;
+    font-weight: bold;
+    color: var(--blue-dark);
+    font-size: 1.05rem;
+}
+.total-balance {
+    text-align: right;
+}
+/* =========================
    CONTENEDOR CENTRAL
    ========================= */
 .contenedor-central {
@@ -400,18 +390,7 @@ button:focus, .header-link:focus, .logout-link:focus, .help-link:focus {
     border: 1px solid red;
 }
 /* =========================
-   FOOTER
-   ========================= */
-footer {
-    margin-top: auto;
-    padding: 20px;
-    text-align: center;
-    background-color: #eeeeee;
-    color: #555;
-    width: 100%;
-}
-/* =========================
-   TABLA MOVIMIENTOS
+   TABLA CUENTAS Y MOVIMIENTOS
    ========================= */
 .tabla-bancaria th,
 .tabla-bancaria td {
@@ -439,6 +418,9 @@ footer {
     top: 50%;
     transform: translateY(-50%);
 }
+/* =========================
+   MOVEMENTS
+   ========================= */
 /* BOTÓN NEW MOVEMENT */
 .btn-new-movement {
     background-color: var(--blue-dark); /* azul oscuro */
@@ -459,8 +441,63 @@ btn-undo:hover {
     color: white;                        /* letras blancas en hover */
     border-color: var(--blue-dark);      /* mantiene el borde azul */
 }
+/* =========================
+   ACCOUNTS
+   ========================= */
+.iniciar{
+    background-color: var(--blue-dark); /* azul oscuro */
+    color: white;                       /* letras blancas */
+    border: none;
+    border-radius: 4px;
+}
+/* BOTÓN MOVEMENTS */
+.movbutton {
+    background-color: var(--blue-dark);
+    color: white;
+    margin-left: 10px;
+    padding: 6px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+.movbutton:hover {
+    background-color: white;
+    color: blue;
+}
+/* Estilo del botón movements en filas par */
+.tabla-bancaria tr:nth-child(odd) .movbutton {
+  background-color: white; /* Blanco */
+  color: var(--blue-dark);
+}
+/* Estilo del botón movements en filas impar */
+.tabla-bancaria tr:nth-child(even) .movbutton {
+  background-color: var(--blue-dark); /* Azul oscuro */
+  color: white;
+}
+/* BÓTÓN DELETE ACCOUNT*/
+.borbutton {
+    background-color: white;
+    color: var(--blue-dark);
+    margin-left: 10px;
+    padding: 6px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+.borbutton:hover {
+    background-color: #002266;
+    color: white;
+}
+/* Estilo del botón borrar en filas impar */
+.tabla-bancaria tr:nth-child(odd) .borbutton {
+  background-color: white; /* Blanco */
+  color: var(--blue-dark);
+}
+/* Estilo del botón borrar en filas par */
+.tabla-bancaria tr:nth-child(even) .borbutton {
+  background-color: var(--blue-dark); /* Azul oscuro */
+  color: white;
+}
 /*==========================
-   FILAS DE LAS TABLAS
+   FILAS DE LAS TABLAS 
 ============================*/
 .tabla-bancaria tbody tr:nth-child(odd) {
     background-color: var(--blue-dark); /* azul oscuro */
@@ -475,9 +512,23 @@ btn-undo:hover {
 .tabla-bancaria tbody tr:hover {
     background-color: var(--light-light-blue); /* azul clarito al pasar el mouse */
     color: white;                        /* letras blancas al hover */
+    cursor: pointer;
 }
 /*==========================
-   ALINEAR AMOUNT Y BALANCE
+   ALINEAR AMOUNT Y BALANCE (CUENTAS)
+============================*/
+.tabla-bancaria td:nth-child(4),
+.tabla-bancaria td:nth-child(6),
+.tabla-bancaria td:nth-child(7),
+.tabla-bancaria th:nth-child(4),
+.tabla-bancaria th:nth-child(6),
+.tabla-bancaria th:nth-child(7) {
+    text-align: right; /* alinea contenido a la derecha */
+   padding-right: 12px;
+}
+
+/*==========================
+   ALINEAR AMOUNT Y BALANCE (MOVEMENTS)
 ============================*/
 .tabla-bancaria td:nth-child(3),
 .tabla-bancaria td:nth-child(4),
@@ -489,6 +540,14 @@ btn-undo:hover {
 /* =========================
    FOOTER
    ========================= */
+    footer {
+    margin-top: auto;
+    padding: 20px;
+    text-align: center;
+    background-color: #eeeeee;
+    color: #555;
+    width: 100%;
+    }
     .help-link {
     color: var(--blue-dark);
     font-weight: bold;
