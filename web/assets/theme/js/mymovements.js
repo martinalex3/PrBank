@@ -44,31 +44,31 @@ document.addEventListener("DOMContentLoaded", () => {
     // CONSTRUIR TABLA
     buildMovementsTable();
     // ABRIR FORMULARIO NEW MOVEMENT
-    document.getElementById("btnOpen").addEventListener("click", () => {
-        document.getElementById("formLayer").style.display = "flex";
+    document.getElementById("btnOpen").addEventListener("click", function() {
+    document.getElementById("formLayer").style.display = "flex";
     });
     // CERRAR FORMULARIO NEW MOVEMENT
-    document.getElementById("btnClose").addEventListener("click", () => {
-        document.getElementById("formLayer").style.display = "none";
+    document.getElementById("btnClose").addEventListener("click", function() {
+    document.getElementById("formLayer").style.display = "none";
     });
-    // ENVIAR FORMULARIO Y CREA NEW MOVEMENT
+    // ENVIAR FORMULARIO Y CREAR NEW MOVEMENT
     document.getElementById("formAccount").addEventListener("submit", createMovement);
-    // BOTON UNDO: CON MENSAJE DE CONFIRMACION
-    document.getElementById("btnUndo").addEventListener("click", () => {
-        if (movements.length > 0) {
-            document.getElementById("confirmLayer").style.display = "flex";
-        } else {
-            alert("There are no moves to delete");
-        }
+    // BOTÓN UNDO: CON MENSAJE DE CONFIRMACIÓN
+    document.getElementById("btnUndo").addEventListener("click", function() {
+    if (movements.length > 0) {
+        document.getElementById("confirmLayer").style.display = "flex";
+    } else {
+        alert("There are no moves to delete");
+    }
     });
-    // BOTON SI, BORRAR (Dentro del confirmLayer)
-    document.getElementById("btnConfirmYes").addEventListener("click", () => {
-        deleteMovement(); // Llamamos a la función de borrar
-        document.getElementById("confirmLayer").style.display = "none"; // CERRAMOS REALIZANDO BORRADO
+    // BOTÓN SI, BORRAR (Dentro del confirmLayer)
+    document.getElementById("btnConfirmYes").addEventListener("click", function() {
+    deleteMovement(); // Llamamos a la función de borrar
+    document.getElementById("confirmLayer").style.display = "none"; // Cerramos tras borrar
     });
-    // BOTON NO, CANCELAR (Dentro del confirmLayer)
-    document.getElementById("btnConfirmNo").addEventListener("click", () => {
-        document.getElementById("confirmLayer").style.display = "none"; // CERRAMOS SIN REALIZAR BORRADO
+    // BOTÓN NO, CANCELAR (Dentro del confirmLayer)
+    document.getElementById("btnConfirmNo").addEventListener("click", function() {
+    document.getElementById("confirmLayer").style.display = "none"; // Cerramos sin borrar
     });
 });
 // ========================= FETCH MOVIMIENTOS =======================
@@ -275,6 +275,39 @@ function updateAccountInfo() {
         balanceBottom.textContent = formattedBalance;
     }
 }
-/* COSAS A CAMBIAR PARA EL CORRECTO FUNCIONAMIENTO:
- * Seguir mirando pruebas de movimientos y comprobar validaciones
-*/
+// ====================== H5P ===============================================
+document.addEventListener("DOMContentLoaded", () => {
+    const videoLayer = document.getElementById("videoLayer");
+    const btnCloseVideo = document.getElementById("btnCloseVideo");
+    const h5pContainer = document.getElementById("h5p-container");
+    let h5pInstance = null;
+
+    document.querySelector(".help-link").onclick = (e) => {
+        e.preventDefault();
+        videoLayer.style.display = "flex";
+
+        if (!h5pInstance) {
+            const options = {
+                h5pJsonPath: '/PrBank/assets/h5p-content',
+                frameJs: '/PrBank/assets/h5p-player/frame.bundle.js',
+                frameCss: '/PrBank/assets/h5p-player/styles/h5p.css',
+                librariesPath: '/PrBank/assets/h5p-libraries'
+            };
+            h5pInstance = new H5PStandalone.H5P(h5pContainer, options);
+        }
+    };
+
+    btnCloseVideo.onclick = () => {
+        videoLayer.style.display = "none";
+        h5pContainer.innerHTML = "";
+        h5pInstance = null;
+    };
+});
+
+// ======================== SCRIPTS DE NAVEGACION ============================
+function goToAccounts() {
+        window.location.href = "myaccounts.html";
+    }
+function logout() {
+        window.location.href = "index.html";
+    }

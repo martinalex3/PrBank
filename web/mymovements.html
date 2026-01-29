@@ -7,6 +7,8 @@
     <title>Movements - PrBank</title>
     <!-- CSS unificado -->
     <link rel="stylesheet" href="assets/theme/css/styles.css">
+    <!-- H5P -->
+    <script src="assets/h5p-player/main.bundle.js"></script>
     <!-- JS -->
     <script src="assets/theme/js/mymovements.js"></script>
     <script src="assets/theme/js/model.js"></script>
@@ -24,8 +26,8 @@
         </div>
     </nav>
 </header>
-
-    <!-- TEXTO AYUDA-->
+    
+    <!-- BOTÓN HELP -->
     <div style="text-align: right; margin-top: 30px; margin-right: 20px;">
         <button class="help-link" onclick="needHelp()">Need Help?</button>
     </div>
@@ -49,7 +51,6 @@
                 Credit Line: <span id="accountCreditText"></span>
             </div>
         </div>
-
         <div class="contenedor-central">
             <div class="recuadro-principal" style="width: 95%; flex-direction: column;">
                 <!-- BOTÓN CREAR A LA IZQUIERDA -->
@@ -133,27 +134,22 @@
                 </div>
             </div>
         </div>
+        
+        <!-- H5P Overlay -->
+        <div id="videoLayer" class="capa-overlay" style="display:none;" role="dialog" aria-modal="true">
+            <div class="recuadro-principal" style="max-width: 900px; width: 95%;">
+                <h3>Help & Tutorial</h3>
+                    <div id="h5p-container" style="width: 100%; min-height: 500px; background: #f9f9f9;"></div>
+                    <div class="botones" style="margin-top: 15px;">
+                    <button type="button" id="btnCloseVideo" class="cancelar">Close Help</button>
+                </div>
+            </div>
+        </div>
     </main>
-
-    <!-- JS DE NAVEGACIÓN -->
-    <script>
-        function goToAccounts() {
-            window.location.href = "myaccounts.html";
-        }
-        function logout() {
-            window.location.href = "index.html";
-        }
-        function needHelp() {
-            window.location.href = "mymovhelp.html";
-        }
-    </script>
-
     <!-- FOOTER -->
     <footer>
         <p>© 2026 PrBank. All Rights Reserved.</p>
         <p>Alejandro Martín, Kenneth León, David Aranda.</p>
     </footer>
-
 </body>
 </html>
-
