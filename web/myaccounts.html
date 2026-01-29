@@ -11,6 +11,7 @@ and open the template in the editor.
     <link rel="shortcut icon" href="assets/theme/images/icon.png" type="image/x-icon">
     <title>Cuentas - PrBank</title>
     <link rel="stylesheet" href="assets/theme/css/styles.css">
+    <script src="assets/h5p-player/main.bundle.js"></script>
     <script src="assets/theme/js/myaccounts.js"></script>
     <script src="assets/theme/js/model.js"></script>
 </head>
@@ -28,7 +29,7 @@ and open the template in the editor.
     </header>
     
     <div style="text-align: right; margin-top: 30px; margin-right: 20px;">
-        <button class="help-link" onclick="needHelp()">Need Help?</button>
+        <button class="help-link">Need Help?</button>
     </div>
 
     <section class="bienvenida">
@@ -42,7 +43,7 @@ and open the template in the editor.
         </div>
                 
         <div class="contenedor-central">
-            <div class="recuadro-principal" style="width: 100%; flex-direction: column;">
+            <div class="recuadro-principal" style="width: 95%; flex-direction: column;">
                 
                 <div style="text-align: left; width: 100%; margin-bottom: 15px;">
                     <button id="btnNuevaCuenta" class="iniciar">
@@ -93,12 +94,22 @@ and open the template in the editor.
                 </form>
             </div>
         </div>
+
+        <div id="videoLayer" class="capa-overlay" style="display:none;" role="dialog" aria-modal="true">
+            <div class="recuadro-principal" style="max-width: 900px; width: 95%;">
+                <h3>Help & Tutorial</h3>
+                <div id="h5p-container" style="width: 100%; min-height: 500px; background: #f9f9f9;"></div>
+                <div class="botones" style="margin-top: 15px;">
+                    <button type="button" id="btnCloseVideo" class="cancelar">Close Help</button>
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <script>
         function goHome() { window.location.href = "index.html"; }
         function logout() { sessionStorage.clear(); window.location.href = "index.html"; }
-        function needHelp() { window.location.href = "myacchelp.html"; }
     </script>
     
     <footer>

@@ -4,13 +4,14 @@ userRowgenerator (); // Función para crear las filas en la tabla con los datos 
 pageLoadHandler (); // Función que refresca la pagina y pinta la tabla con los datos actualizados.
 generateRandomAccountId (); // Función que genera un id aleatorio de cuenta.
 */
-
+// VARIABLES GLOBALES:
 const SERVICE_URL = "/CRUDBankServerSide/webresources/account/customer/";
 const ACCOUNT_URL = "/CRUDBankServerSide/webresources/account/";
 
 document.addEventListener("DOMContentLoaded", () => {
     pageLoadHandler();
-
+    
+    // CONTROLES FORMULARIO CUENTA:
     const formLayer = document.getElementById("formLayer");
     const formAccount = document.getElementById("formAccount");
     const typeSelect = document.getElementById("type");
@@ -37,6 +38,33 @@ document.addEventListener("DOMContentLoaded", () => {
         formLayer.style.display = "none";
         formAccount.reset();
         creditContainer.style.display = "none";
+    };
+
+    // CONTROLES VIDEO H5P:
+    const videoLayer = document.getElementById("videoLayer");
+    const btnCloseVideo = document.getElementById("btnCloseVideo");
+    const h5pContainer = document.getElementById("h5p-container");
+    let h5pInstance = null;
+
+    document.querySelector(".help-link").onclick = (e) => {
+        e.preventDefault();
+        videoLayer.style.display = "flex";
+
+        if (!h5pInstance) {
+            const options = {
+                h5pJsonPath: '/PrBank/assets/h5p-content',
+                frameJs: '/PrBank/assets/h5p-player/frame.bundle.js',
+                frameCss: '/Prbank/assets/h5p-player/styles/h5p.css',
+                librariesPath: '/PrBank/assets/h5p-libraries'
+            };
+            h5pInstance = new H5PStandalone.H5P(h5pContainer, options);
+        }
+    };
+
+    btnCloseVideo.onclick = () => {
+        videoLayer.style.display = "none";
+        h5pContainer.innerHTML = ""; // Limpia el contenido para detener el video
+        h5pInstance = null;
     };
 
     formAccount.onsubmit = async (event) => {
@@ -161,13 +189,9 @@ function* userRowGenerator(accounts) {
 async function pageLoadHandler() {
     try {
         const accounts = await fetchAccounts();
-        
-        // CORRECCIÓN: Pasar el array accounts a la función de balance
         totalBalanceAccounts(accounts); 
-
         const tbody = document.querySelector("#tableBody");
         tbody.innerHTML = "";
-        
         const rowGenerator = userRowGenerator(accounts);
         for (const row of rowGenerator) {
             tbody.appendChild(row);
@@ -190,7 +214,6 @@ async function deleteAccount(id) {
     }
 }
 
-// CORRECCIÓN: Función agregada con reduce corregido
 function totalBalanceAccounts(accounts) {
     const totalBalance = accounts.reduce((acumulador, cuenta) => {
         return acumulador + (parseFloat(cuenta.balance) || 0);
