@@ -4,11 +4,13 @@ userRowgenerator (); // Función para crear las filas en la tabla con los datos 
 pageLoadHandler (); // Función que refresca la pagina y pinta la tabla con los datos actualizados.
 generateRandomAccountId (); // Función que genera un id aleatorio de cuenta.
 */
+
 // VARIABLES GLOBALES:
 const SERVICE_URL = "/CRUDBankServerSide/webresources/account/customer/";
 const ACCOUNT_URL = "/CRUDBankServerSide/webresources/account/";
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", function() {
+    displayUserData();
     pageLoadHandler();
     
     // CONTROLES FORMULARIO CUENTA:
@@ -18,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const creditContainer = document.getElementById("creditLineContainer");
     const creditInput = document.getElementById("creditLineInput");
 
-    typeSelect.addEventListener("change", () => {
+    typeSelect.addEventListener("change", function() {
         if (typeSelect.value === "1000") {
             creditContainer.style.display = "block";
             creditInput.required = true;
@@ -30,11 +32,11 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    document.getElementById("btnNuevaCuenta").onclick = () => {
+    document.getElementById("btnNuevaCuenta").onclick = function() {
         formLayer.style.display = "flex";
     };
 
-    document.getElementById("btnClose").onclick = () => {
+    document.getElementById("btnClose").onclick = function() {
         formLayer.style.display = "none";
         formAccount.reset();
         creditContainer.style.display = "none";
@@ -46,7 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const h5pContainer = document.getElementById("h5p-container");
     let h5pInstance = null;
 
-    document.querySelector(".help-link").onclick = (e) => {
+    document.querySelector(".help-link").onclick = function(e) {
         e.preventDefault();
         videoLayer.style.display = "flex";
 
@@ -61,13 +63,13 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    btnCloseVideo.onclick = () => {
+    btnCloseVideo.onclick = function() {
         videoLayer.style.display = "none";
-        h5pContainer.innerHTML = ""; // Limpia el contenido para detener el video
+        h5pContainer.innerHTML = ""; 
         h5pInstance = null;
     };
 
-    formAccount.onsubmit = async (event) => {
+    formAccount.onsubmit = async function(event) {
         event.preventDefault();
         const balance = parseFloat(document.getElementById("balance").value);
         let creditLineValue = 0;
@@ -123,6 +125,9 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 });
 
+
+//Función asincrona para recopilar los datos de la cuentas (FETCH)
+
 async function fetchAccounts() {
     const customerId = sessionStorage.getItem("customer.id").replace(/[,.]/g, "");
     const response = await fetch(`${SERVICE_URL}${customerId}?t=${new Date().getTime()}`, {
@@ -132,12 +137,16 @@ async function fetchAccounts() {
     return await response.json();
 }
 
+//Función generadora para generar las filas de la tabla con los datos del servidor.
+
 function* userRowGenerator(accounts) {
-    for (const account of accounts) {
+    for (let i = 0; i < accounts.length; i++) {
+        const account = accounts[i];
         const tr = document.createElement("tr");
         const fields = ["id", "description", "type", "creditLine", "beginBalanceTimestamp", "beginBalance", "balance"];
         
-        fields.forEach(field => {
+        for (let j = 0; j < fields.length; j++) {
+            const field = fields[j];
             const td = document.createElement("td");
             let value = account[field];
 
@@ -161,13 +170,14 @@ function* userRowGenerator(accounts) {
                 td.textContent = value !== undefined ? value : "";
             }
             tr.appendChild(td);
-        });
+        }
 
         const tdAction = document.createElement("td");
+        
         const btnVer = document.createElement("button");
         btnVer.classList.add('movbutton');
         btnVer.textContent = "Movements";
-        btnVer.onclick = () => {
+        btnVer.onclick = function() {
             sessionStorage.setItem("account.id", account.id);
             sessionStorage.setItem("account.balance", account.balance);
             sessionStorage.setItem("account.creditLine", account.creditLine);
@@ -177,7 +187,9 @@ function* userRowGenerator(accounts) {
         const btnBorrar = document.createElement("button");
         btnBorrar.classList.add('borbutton');
         btnBorrar.textContent = "Delete";
-        btnBorrar.onclick = () => deleteAccount(account.id);
+        btnBorrar.onclick = function() {
+            deleteAccount(account.id);
+        };
         
         tdAction.appendChild(btnVer);
         tdAction.appendChild(btnBorrar);
@@ -185,6 +197,7 @@ function* userRowGenerator(accounts) {
         yield tr;
     }
 }
+//Función asíncrona  de refresco de las filas de la tabla
 
 async function pageLoadHandler() {
     try {
@@ -201,8 +214,10 @@ async function pageLoadHandler() {
     }
 }
 
+//Función asíncrona de borrado de cuentas (ID)
+
 async function deleteAccount(id) {
-    if (confirm(`Are you sure you want to delete account ${id}?`)) {
+    if (confirm("Are you sure you want to delete account " + id + "?")) {
         try {
             const res = await fetch(ACCOUNT_URL + id, { method: "DELETE" });
             if (res.ok) {
@@ -215,9 +230,10 @@ async function deleteAccount(id) {
 }
 
 function totalBalanceAccounts(accounts) {
-    const totalBalance = accounts.reduce((acumulador, cuenta) => {
-        return acumulador + (parseFloat(cuenta.balance) || 0);
-    }, 0);
+    let totalBalance = 0;
+    for (let i = 0; i < accounts.length; i++) {
+        totalBalance += (parseFloat(accounts[i].balance) || 0);
+    }
 
     const formateador = new Intl.NumberFormat("es-ES", {
         style: "currency",
@@ -230,7 +246,19 @@ function totalBalanceAccounts(accounts) {
     if (txtTop) txtTop.textContent = formateador;
     if (txtBottom) txtBottom.textContent = formateador;
 }
-/**
+
+// Función para cargar y mostrar el nombre del usuario
+function displayUserData() {
+    const firstName = sessionStorage.getItem("customer.firstName");
+    const lastName = sessionStorage.getItem("customer.lastName");
+    const displayElement = document.getElementById("userNameDisplay");
+
+    if (displayElement && firstName && lastName) {
+        displayElement.textContent = firstName + " " + lastName;
+    }
+}
+
+  /**
  * //Función para parsear datos en XML (NO NECESARIA YA UTILIZAMOS JSON)
  */
 /*function parseUsersXML(xmlText) {
@@ -247,7 +275,7 @@ function totalBalanceAccounts(accounts) {
     }
     return users;
 }
-*/
+
 
 //**Resumen del Flujo DELETE
 /*Carga página → Fetch datos (JSON) → 
@@ -257,8 +285,4 @@ Usuario presiona borrar →
 target detecta el ID → 
 Petición DELETE → 
 Refresco automático.
-*/
-
-
-       
-
+*/   
