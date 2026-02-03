@@ -14,7 +14,11 @@ const ACCOUNT_URL = "/CRUDBankServerSide/webresources/account/";
 let movements = [];
 // ====================== DOM CONTENT LOADED ============================
 // EJECUCION CUANDO EL HTML SE EJECUTA POR COMPLETO
-document.addEventListener("DOMContentLoaded", () => {
+//document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", function(){
+    buildMovementsTable();
+    updateAccountInfo();
+    syncAccountBalance();
     // GUARDAR EL BALANCE INICIAL DE LA CUENTA
     const initialBalance = parseFloat(sessionStorage.getItem("account.balance")) || 0;
     sessionStorage.setItem("account.initialBalance", initialBalance);
@@ -130,7 +134,7 @@ async function buildMovementsTable() {
     for (const row of rowGenerator) {
         tbody.appendChild(row);
     }
-    // ACTUALIZA LOS DASTOS DE LA CUENTA EN PANTALLA - AL MAS RECIENTE
+    // ACTUALIZA LOS DASTOS DE LA CUENTA EN PANTALLA AL MAS RECIENTE
     updateAccountInfo();
 }
 // =================== CREACION DE MOVIMIENTOS ====================
@@ -303,6 +307,7 @@ document.addEventListener("DOMContentLoaded", () => {
         h5pInstance = null;
     };
 });
+// ======================== ASYNC DE CUENTAS ===============================
 
 // ======================== SCRIPTS DE NAVEGACION ============================
 function goToAccounts() {
