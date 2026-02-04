@@ -140,124 +140,148 @@ async function buildMovementsTable() {
 // =================== CREACION DE MOVIMIENTOS ====================
 // CREACIÓN DE MOVIMIENTOS (Crud)
 async function createMovement(evt) {
-    evt.preventDefault(); 
+    evt.preventDefault();
+
     try {
         const tfAmount = document.getElementById("tfAmount");
         const rbDeposit = document.getElementById("rbDeposit");
-        //  VARIABLES PARA DEFINIR EL MOVIMIENTO
-        let description;
-        let balance;
-        // BALANCE ACTUAL DE LA CUENTA
-        let currentBalance = parseFloat(sessionStorage.getItem("account.balance")) || 0;
+
         let amountValue = parseFloat(tfAmount.value);
-        // VALIDACION: NO PERMITE SIGNOS NI NUMEROS NEGATIVOS
-        if (isNaN(amountValue) || amountValue < 0) {
-            alert("Please, enter a valid amount, without negative signs or values..");
-        return;
+        if (isNaN(amountValue) || amountValue <= 0) {
+            alert("Please enter a valid positive amount.");
+            return;
         }
-        // LINEA PARA COGER CORRECTAMENTE EL CREDITLINE DE CUENTAS
-        let creditLine = parseFloat(sessionStorage.getItem("account.creditLine")) || 0;
-        // ELECCION DEPENDIENDO DEL RADIOBUTTON
-        if (rbDeposit.checked){ 
+
+        const account = getAccountFromStorage();
+        let newBalance;
+        let description;
+
+        if (rbDeposit.checked) {
             description = "Deposit";
-            balance = currentBalance + amountValue;
-        } else { 
+            newBalance = account.balance + amountValue;
+        } else {
             description = "Payment";
-            balance = currentBalance - amountValue;
-            
-            // VALIDACIÓN DE CRÉDITO
-            if (balance < -creditLine) {
-                alert(`Transaction denied. Credit limit exceeded. Your limit is -${creditLine}€`);
+            newBalance = account.balance - amountValue;
+
+            if (newBalance < -account.creditLine) {
+                alert("Transaction denied. Credit limit exceeded.");
                 return;
             }
         }
-        //ARRAY NUEVO MOVIMIENTO PARA CALCULAR SALDO DE LA CUENTA ACTUALIZADO
+
         const newMovement = {
             id: null,
             amount: amountValue,
             description: description,
             timestamp: new Date().toISOString(),
-            balance: balance
+            balance: newBalance
         };
-        // FETCH CON POST PARA ENVIO DE DATOS
-        const response = await fetch(SERVICE_DEL_URL + sessionStorage.getItem("account.id"), {
-            method: "POST",
-            headers: {
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(newMovement)
-        });
-        // EN CASO DE ERROR
-        if (!response.ok) throw new Error("Server Failed");
-        // SINCRONIZACIÓN CON ACCOUNTS
-        await syncAccountBalance(balance);
-        // GUARDAMOS EL NUEVO BALANCE EN SESSIONSTORAGE
-        sessionStorage.setItem("account.balance", balance);
+
+        const response = await fetch(
+            SERVICE_DEL_URL + sessionStorage.getItem("account.id"),
+            {
+                method: "POST",
+                headers: {
+                    "Accept": "application/json",
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(newMovement)
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error("Error creating movement");
+        }
+
+        account.balance = newBalance;
+        await syncAccountBalance(account);
+
+        await buildMovementsTable();
         updateAccountInfo();
-        // SE LIMPIA LA TALA Y SE RECARGA
-        document.querySelector("#tableBody").innerHTML = "";
-        await buildMovementsTable();        
-        // SE CIERRA Y SE LIMPIA EL FORMULARIO
+
         document.getElementById("formLayer").style.display = "none";
         document.getElementById("formAccount").reset();
+
     } catch (error) {
-        console.error("ERROR:", error);
+        console.error("Create movement failed:", error);
     }
 }
 // ============= SINCRONIZACION DE CUENTA ====================
 // ACTUALIZA EL BALANCE DE LA CUENTA EN EL SERVIDOR
-async function syncAccountBalance(newBalance) {
-    const accId = sessionStorage.getItem("account.id");
+// SE REALIZA UN GET PREVIO PARA OBTENER LA CUENTA COMPLETA
+// EVITA QUE EL PUT BORRE CAMPOS COMO description, beginBalance, customers, etc.
+async function syncAccountBalance(accountId, newBalance) {
     try {
-        const res = await fetch(ACCOUNT_URL + accId);
-        const accountData = await res.json();
-        accountData.balance = newBalance;
+        // SE RECUPERA LA CUENTA COMPLETA
+        const account = await fetchAccountById(accountId);
 
-        await fetch(ACCOUNT_URL + accId, {
+        // MODIFICAMOS SOLO EL BALANCE
+        account.balance = newBalance;
+
+        // ENVIAMOS EL OBJETO COMPLETO MEDIANTE PUT
+        const response = await fetch(ACCOUNT_URL, {
             method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(accountData)
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify(account)
         });
-    } catch (e) {
-        console.error("Error synchronizing balance:", e);
-    }
-}
-// ===================== BORRADO DE MOVIMIENTOS ====================
-// FETCH CON DELETE PARA BOORADO DE MOVIMIENTOS
-async function deleteMovement() {
-    // OBTENEMOS EL ID DEL ULTIMO MOVIMIENTO
-    const movid = movements[movements.length - 1].id;
-    const response = await fetch(SERVICE_DEL_URL + `${encodeURIComponent(movid)}`, {
-        method: "DELETE"
-    });
 
-    if (response.ok) {
-        // REMOVER EL ULTIMO MOVIMIENTO DEL ARRAY
-        movements.pop();
-        
-        // DETERMINAR EL NUEVO BALANCE
-        let newBalance;
-        if (movements.length === 0) {
-            // SI NO QUEDAN MOVIMIENTOS, RESTAURAR BALANCE INICIAL
-            newBalance = parseFloat(sessionStorage.getItem("account.initialBalance")) || 0;
-        } else {
-            // SI QUEDAN MOVIMIENTOS, TOMAR EL BALANCE DEL ULTIMO
-            newBalance = movements[movements.length - 1].balance;
+        if (!response.ok) {
+            throw new Error("Error updating account");
         }
 
-        // ACTUALIZAR SESSIONSTORAGE Y SERVIDOR
+        // ACTUALIZAMOS EL BALANCE EN SESSIONSTORAGE
         sessionStorage.setItem("account.balance", newBalance);
-        await syncAccountBalance(newBalance);
 
-        // RECONSTRUIR TABLA Y ACTUALIZAR INFO
-        document.querySelector("#tableBody").innerHTML = "";
-        await buildMovementsTable();
-        updateAccountInfo();
-    } else {
-        console.error("The movement could not be deleted");
+    } catch (error) {
+        console.error("Account sync failed:", error);
     }
 }
+
+// ===================== BORRADO DE MOVIMIENTOS ====================
+// FETCH CON DELETE PARA BORRADO DE MOVIMIENTOS
+// BORRADO DEL ULTIMO MOVIMIENTO Y RECALCULO DEL BALANCE
+// NO SE ELIMINA LA CUENTA, SOLO SE ACTUALIZA SU BALANCE
+async function deleteMovement() {
+    if (movements.length === 0) return;
+
+    const lastMovement = movements[movements.length - 1];
+    const movid = lastMovement.id;
+    const accountId = sessionStorage.getItem("account.id");
+
+    try {
+        // PETICION DELETE AL SERVIDOR PARA ELIMINAR EL MOVIMIENTO
+        const response = await fetch(
+            SERVICE_DEL_URL + encodeURIComponent(movid),
+            { method: "DELETE", headers: { "Accept": "application/json" } }
+        );
+
+        if (!response.ok) {
+            throw new Error("Error deleting movement");
+        }
+        // ELIMINAMOS EL MOVIMIENTO DEL ARRAY LOCAL
+        movements.pop();
+        // RECALCULAMOS EL BALANCE SEGUN EL TIPO DE MOVIMIENTO
+        let currentBalance = parseFloat(sessionStorage.getItem("account.balance"));
+
+        if (lastMovement.description === "Deposit") {
+            currentBalance -= lastMovement.amount;
+        } else {
+            currentBalance += lastMovement.amount;
+        }
+        // SINCRONIZAMOS EL NUEVO BALANCE CON EL SERVIDOR
+        await syncAccountBalance(accountId, currentBalance);
+        // REFRESCAMOS TABLA E INFORMACION DE CUENTA
+        await buildMovementsTable();
+        updateAccountInfo();
+
+    } catch (error) {
+        console.error("Delete movement failed:", error);
+    }
+}
+
 //====================== FUNCIONES EXTRAS ==================================
 // FUNCION PARA ACTUALIZAR EL BALANCE Y EL ID DE LA CUENTA.
 function updateAccountInfo() {
@@ -308,6 +332,29 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 });
 // ======================== ASYNC DE CUENTAS ===============================
+// FUNCION PARA OBTENER LOS DATOS BASICOS DE LA CUENTA DESDE SESSIONSTORAGE
+
+function getAccountFromStorage() {
+    return {
+        id: sessionStorage.getItem("account.id"),
+        balance: parseFloat(sessionStorage.getItem("account.balance")) || 0,
+        creditLine: parseFloat(sessionStorage.getItem("account.creditLine")) || 0
+    };
+}
+// FUNCION ASINCRONA PARA OBTENER UNA CUENTA COMPLETA DESDE EL SERVIDOR
+// SE USA ANTES DE HACER UN PUT PARA EVITAR BORRAR CAMPOS IMPORTANTES
+async function fetchAccountById(accountId) {
+    const response = await fetch(ACCOUNT_URL + accountId, {
+        method: "GET",
+        headers: { "Accept": "application/json" }
+    });
+
+    if (!response.ok) {
+        throw new Error("Error fetching account");
+    }
+
+    return await response.json();
+}
 
 // ======================== SCRIPTS DE NAVEGACION ============================
 function goToAccounts() {
