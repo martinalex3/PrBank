@@ -239,7 +239,6 @@ async function syncAccountBalance(accountId, newBalance) {
         console.error("Account sync failed:", error);
     }
 }
-
 // ===================== BORRADO DE MOVIMIENTOS ====================
 // FETCH CON DELETE PARA BORRADO DE MOVIMIENTOS
 // BORRADO DEL ULTIMO MOVIMIENTO Y RECALCULO DEL BALANCE
@@ -281,7 +280,6 @@ async function deleteMovement() {
         console.error("Delete movement failed:", error);
     }
 }
-
 //====================== FUNCIONES EXTRAS ==================================
 // FUNCION PARA ACTUALIZAR EL BALANCE Y EL ID DE LA CUENTA.
 function updateAccountInfo() {
@@ -333,7 +331,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 // ======================== ASYNC DE CUENTAS ===============================
 // FUNCION PARA OBTENER LOS DATOS BASICOS DE LA CUENTA DESDE SESSIONSTORAGE
-
 function getAccountFromStorage() {
     return {
         id: sessionStorage.getItem("account.id"),
@@ -355,7 +352,6 @@ async function fetchAccountById(accountId) {
 
     return await response.json();
 }
-
 // ======================== SCRIPTS DE NAVEGACION ============================
 function goToAccounts() {
         window.location.href = "myaccounts.html";
