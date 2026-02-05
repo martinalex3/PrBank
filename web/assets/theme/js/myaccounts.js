@@ -1,40 +1,43 @@
-/**FUNCIONES:
-fetchAccounts (); // Función para obtener las cuentas bancarias del servidor.
-userRowgenerator (); // Función para crear las filas en la tabla con los datos obetenidos del servidor.(actualizada cpon el formato de fecha y moneda)
-pageLoadHandler (); // Función que refresca la pagina y pinta la tabla con los datos actualizados.
-generateRandomAccountId (); // Función que genera un id aleatorio de cuenta.
-*/
 
-// VARIABLES GLOBALES:
+// ====================VARIABLES GLOBALES (ENDPOINTS)===========================
+
 const SERVICE_URL = "/CRUDBankServerSide/webresources/account/customer/";
 const ACCOUNT_URL = "/CRUDBankServerSide/webresources/account/";
 
+// ====================INICIALIZACIÓN DE LA INTERFAZ============================
+
 document.addEventListener("DOMContentLoaded", function() {
-    displayUserData();
-    pageLoadHandler();
+    displayUserData(); // MOSTRAR USUARIO LOGUEADO
+    pageLoadHandler(); // CARGA INICIAL DE LA TABLA DE CUENTAS
     
-    // CONTROLES FORMULARIO CUENTA:
+// =====================CONTROLES FORMULARIO CUENTA=============================
+    
     const formLayer = document.getElementById("formLayer");
     const formAccount = document.getElementById("formAccount");
     const typeSelect = document.getElementById("type");
     const creditContainer = document.getElementById("creditLineContainer");
     const creditInput = document.getElementById("creditLineInput");
+    
+//LÓGICA MOSTRAR/OCULTAR CAMPO "LÍNEA DE CREDITO" SEGÚN TIPO DE CUENTA:
 
     typeSelect.addEventListener("change", function() {
-        if (typeSelect.value === "1000") {
+        if (typeSelect.value === "1000") { // CRÉDITO
             creditContainer.style.display = "block";
             creditInput.required = true;
             creditInput.setAttribute("min", "50");
         } else {
-            creditContainer.style.display = "none";
+            creditContainer.style.display = "none"; //STANDARD
             creditInput.required = false;
             creditInput.value = "";
         }
     });
+// ABRIR CAPA DE CUENTA NUEVA:
 
     document.getElementById("btnNuevaCuenta").onclick = function() {
         formLayer.style.display = "flex";
     };
+
+// CERRAR CAPA Y RESETEAR CAMPOS:
 
     document.getElementById("btnClose").onclick = function() {
         formLayer.style.display = "none";
@@ -42,7 +45,8 @@ document.addEventListener("DOMContentLoaded", function() {
         creditContainer.style.display = "none";
     };
 
-    // CONTROLES VIDEO H5P:
+// ==============CONTROLES VIDEO DE AYUDA (H5P)=================================
+
     const videoLayer = document.getElementById("videoLayer");
     const btnCloseVideo = document.getElementById("btnCloseVideo");
     const h5pContainer = document.getElementById("h5p-container");
@@ -53,7 +57,7 @@ document.addEventListener("DOMContentLoaded", function() {
         videoLayer.style.display = "flex";
 
         if (!h5pInstance) {
-            const options = {
+            const options = { // INDICAMOS LAS RUTAS PARA QUE LA APLICACION TENGA ACCESO A ASSETS DE H5P
                 h5pJsonPath: '/PrBank/assets/h5p-content',
                 frameJs: '/PrBank/assets/h5p-player/frame.bundle.js',
                 frameCss: '/Prbank/assets/h5p-player/styles/h5p.css',
@@ -65,14 +69,18 @@ document.addEventListener("DOMContentLoaded", function() {
 
     btnCloseVideo.onclick = function() {
         videoLayer.style.display = "none";
-        h5pContainer.innerHTML = ""; 
+        h5pContainer.innerHTML = ""; // LIMPIA EL CONTENEDOR AL CERRAR
         h5pInstance = null;
     };
+
+// ENVIO DEL FORMULARIO (POST):
 
     formAccount.onsubmit = async function(event) {
         event.preventDefault();
         const balance = parseFloat(document.getElementById("balance").value);
         let creditLineValue = 0;
+
+// VALIDACIÓN DE LA CUENTA DE CRÉDITO:
 
         if (typeSelect.value === "1000") {
             creditLineValue = parseFloat(creditInput.value);
@@ -82,22 +90,27 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         }
 
+// OBTENCIÓN DEL ID Y LIMPIEZA DEL ID DEL CLIENTE DESDE LA SESIÓN:
+
         const custIdRaw = sessionStorage.getItem("customer.id");
         if (!custIdRaw) {
             alert("Session expired. Please log in again.");
             window.location.href = "index.html";
             return;
         }
+// ELIMINACIÓN DE CARACTERES PROBLEMÁTICOS COMO PUNTOS Y COMAS:
 
         const idLimpio = parseInt(custIdRaw.replace(/[,.]/g, ""));
 
+// CREACIÓN DEL OBJETO CUENTA PARA EL SERVIDOR:
+
         const nuevaCuenta = {
-            id: Math.floor(Math.random() * 100000000),
+            id: Math.floor(Math.random() * 100000000), // ID ALEATORIO TEMPORAL
             description: document.getElementById("description").value,
             balance: balance,
             creditLine: creditLineValue,
             beginBalance: balance,
-            beginBalanceTimestamp: new Date().toISOString().split('.')[0] + "Z",
+            beginBalanceTimestamp: new Date().toISOString().split('.')[0] + "Z", // FORMATO DE FECHA ISO SEGÚN LAS REGLAS DEL BACKEND
             "customers": [{ "id": idLimpio }]
         };
 
@@ -108,14 +121,14 @@ document.addEventListener("DOMContentLoaded", function() {
                     "Content-Type": "application/json", 
                     "Accept": "application/json" 
                 },
-                body: JSON.stringify(nuevaCuenta)
+                body: JSON.stringify(nuevaCuenta) // CONVERTIMOS A CADENA JSON
             });
 
             if (response.ok) {
                 formLayer.style.display = "none";
                 formAccount.reset();
                 creditContainer.style.display = "none";
-                pageLoadHandler();
+                pageLoadHandler(); // LLAMAMOS ALA FUNCION DE REFRESCO.
             } else {
                 alert("Error creating account.");
             }
@@ -126,18 +139,21 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 
-//Función asincrona para recopilar los datos de la cuentas (FETCH)
+// ============FUNCIONES ASÍNCRONAS:=======================================================
+
+
+// FUNCION ASÍNCRONA QUE OBTIENE TODOS LOS DATOS DE CUESNTAS DEL USUARIO ACTUAL (GET):
 
 async function fetchAccounts() {
     const customerId = sessionStorage.getItem("customer.id").replace(/[,.]/g, "");
     const response = await fetch(`${SERVICE_URL}${customerId}?t=${new Date().getTime()}`, {
         method: "GET",
-        headers: { "Accept": "application/json" }
+        headers: { "Accept": "application/json" } // UTILIZAMOS JSON
     });
     return await response.json();
 }
 
-//Función generadora para generar las filas de la tabla con los datos del servidor.
+//FUNCIÓN GENERADORA DE LA FILAS Y CELDAS DE LA TABLA SEGUN LOS DATOS DEL SERVIDOR:
 
 function* userRowGenerator(accounts) {
     for (let i = 0; i < accounts.length; i++) {
@@ -149,6 +165,8 @@ function* userRowGenerator(accounts) {
             const field = fields[j];
             const td = document.createElement("td");
             let value = account[field];
+
+// VALIDACIÓN POR TIPO DE CUENTA:
 
             if (field === "type") {
                 td.textContent = account.creditLine > 0 ? "CREDIT" : "STANDARD";
@@ -172,7 +190,11 @@ function* userRowGenerator(accounts) {
             tr.appendChild(td);
         }
 
+// COLUMNA DE ACCIONES (BOTÓN DE MOVIMIENTOS Y BORRAR):
+
         const tdAction = document.createElement("td");
+
+// BOTÓN MOVEMENTS: GUARDA ID, BALANCE, CREDIT LINE Y REDIRIGE:
         
         const btnVer = document.createElement("button");
         btnVer.classList.add('movbutton');
@@ -183,6 +205,8 @@ function* userRowGenerator(accounts) {
             sessionStorage.setItem("account.creditLine", account.creditLine);
             window.location.href = "mymovements.html";
         };
+        
+// BOTÓN BORRAR: LLAMA A LA FUNCIÓN DE ELIMINACIÓN:
 
         const btnBorrar = document.createElement("button");
         btnBorrar.classList.add('borbutton');
@@ -194,17 +218,19 @@ function* userRowGenerator(accounts) {
         tdAction.appendChild(btnVer);
         tdAction.appendChild(btnBorrar);
         tr.appendChild(tdAction);
-        yield tr;
+        yield tr; // RETORNA LA FILA Y PAUSA EJECUCIÓN
     }
 }
-//Función asíncrona  de refresco de las filas de la tabla
+
+
+// FUNCIÓN ASÍNCRONA DE CARGA DE LA PÁGINA:
 
 async function pageLoadHandler() {
     try {
         const accounts = await fetchAccounts();
-        totalBalanceAccounts(accounts); 
+        totalBalanceAccounts(accounts); // ACTUALIZA EL SUMATORIO TOTAL
         const tbody = document.querySelector("#tableBody");
-        tbody.innerHTML = "";
+        tbody.innerHTML = ""; // LIMPIEZA DE DATOS PREVIOS DE LA TABLA
         const rowGenerator = userRowGenerator(accounts);
         for (const row of rowGenerator) {
             tbody.appendChild(row);
@@ -214,7 +240,7 @@ async function pageLoadHandler() {
     }
 }
 
-//Función asíncrona de borrado de cuentas (ID)
+// FUNCIÓN ASÍNCRONA DE BORRADO DE CUENTAS:
 
 async function deleteAccount(id) {
     if (confirm("Are you sure you want to delete account " + id + "?")) {
@@ -229,11 +255,17 @@ async function deleteAccount(id) {
     }
 }
 
+//===================OTRAS  FUNCIONES=======================================
+
+// FUNCIÓN DE CALCULO DE BALANCE DE TODAS LAS CUENTAS DEL USUARIO:
+
 function totalBalanceAccounts(accounts) {
     let totalBalance = 0;
     for (let i = 0; i < accounts.length; i++) {
         totalBalance += (parseFloat(accounts[i].balance) || 0);
     }
+
+// FORMATEO DE DIVISA E IMPORTES DEL BALANCE:
 
     const formateador = new Intl.NumberFormat("es-ES", {
         style: "currency",
@@ -247,7 +279,8 @@ function totalBalanceAccounts(accounts) {
     if (txtBottom) txtBottom.textContent = formateador;
 }
 
-// Función para cargar y mostrar el nombre del usuario
+// FUNCIÓN DE OBTENCIÓN DEL NOMBRE Y APELLIDO DE USUARIO (BIENVENIDA):
+
 function displayUserData() {
     const firstName = sessionStorage.getItem("customer.firstName");
     const lastName = sessionStorage.getItem("customer.lastName");
@@ -259,7 +292,7 @@ function displayUserData() {
 }
 
   /**
- * //Función para parsear datos en XML (NO NECESARIA YA UTILIZAMOS JSON)
+ * //FUNCIÓN PARA PARSEAR DATOS EN XML (NO NECESARIA YA UTILIZAMOS JSON)
  */
 /*function parseUsersXML(xmlText) {
     const parser = new DOMParser();
