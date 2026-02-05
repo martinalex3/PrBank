@@ -36,15 +36,14 @@ function handleSignInOnClick(event) {
         event.stopPropagation();
 
         if (tfEmail.value.trim() === "" || tfPassword.value.trim() === "")
-            throw new Error("El correo electrónico y la contraseña deben de estar informados.");
-
+            throw new Error("The email and password fields must be filled.");
         if (tfEmail.value.length > 255)
-            throw new Error("El correo electrónico no puede tener más de 255 caracteres.");
+            throw new Error("Email cannot have more than 255 characters.");
         if (tfPassword.value.length > 255)
-            throw new Error("La contraseña no puede tener más de 255 caracteres.");
+            throw new Error("password cannot have more than 255 characters.");
 
         if (!emailRegExp.exec(tfEmail.value.trim()))
-            throw new Error("El correo electrónico no tiene un formato válido, inténtelo de nuevo.");
+            throw new Error("Email does not have a coorect format, please try again.");
 
         sendSignInRequestAndProcessResponse();
     } catch (error) {
@@ -72,15 +71,15 @@ function sendSignInRequestAndProcessResponse() {
     .then(response => {
         if (response.status === 401) {
             return response.text().then(() => {
-                throw new Error('Credenciales incorrectas, por favor, inténtelo de nuevo.');
+                throw new Error('Wrong credentials, please, try again.');
             });
         } else if (response.status === 500) {
             return response.text().then(() => {
-                throw new Error('Error del servidor! Por favor inténtelo más tarde.');
+                throw new Error('Server fail! Please try again.');
             });
         } else if (!response.ok) {
             return response.text().then(text => {
-                throw new Error(text || 'Error inesperado! Sentimos las molestias');
+                throw new Error(text || 'Unexpected error occured!');
             });
         }
         return response.text(); // Se devuleve el XML como string
@@ -88,7 +87,7 @@ function sendSignInRequestAndProcessResponse() {
     //Procesamiento de inicio de sesion OK(200)
     .then(xmlString => {
         msgBox.className = 'success';
-        msgBox.textContent = 'Sesión del usuario iniciada con éxito! Redirigiendo...';
+        msgBox.textContent = 'User signed in succesfully! Redirecting...';
         msgBox.style.display = 'block';
 
         // Guardar datos en sessionStorage
