@@ -1,4 +1,3 @@
-
 // ====================VARIABLES GLOBALES (ENDPOINTS)===========================
 
 const SERVICE_URL = "/CRUDBankServerSide/webresources/account/customer/";
@@ -58,6 +57,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         if (!h5pInstance) {
             const options = { // INDICAMOS LAS RUTAS PARA QUE LA APLICACION TENGA ACCESO A ASSETS DE H5P
+                h5pJsonPath: '/PrBank/assets/h5p-content',
                 h5pJsonPath: '/PrBank/assets/h5p-content',
                 frameJs: '/PrBank/assets/h5p-player/frame.bundle.js',
                 frameCss: '/Prbank/assets/h5p-player/styles/h5p.css',
@@ -248,9 +248,13 @@ async function deleteAccount(id) {
             const res = await fetch(ACCOUNT_URL + id, { method: "DELETE" });
             if (res.ok) {
                 pageLoadHandler();
+            } else {
+                // MENSAJE DE CONFIRMACIÓN EN CASO DE ERROR (POR MOVIMIENTOS ASOCIADOS)
+                alert("This account cannot be deleted because it has associated movements. Please delete the movements first.");
             }
         } catch (error) {
             console.error("Delete error:", error);
+            alert("A network error occurred while trying to delete the account.");
         }
     }
 }
