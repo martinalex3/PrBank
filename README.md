@@ -1,5 +1,5 @@
 # PrBank 🏦
-![Portada de PrBank](https://via.placeholder.com/800x200?text=PrBank+Financial+Management+System)
+![Portada de PrBank](https://cdn-icons-png.flaticon.com/512/10068/10068850.png)
 
 > **Sistema de gestión bancaria digital.** Una plataforma intuitiva para el control de activos, cuentas de crédito y ahorro con soporte multimedia integrado.
 
@@ -22,7 +22,7 @@
 6. [Tecnologías utilizadas](#-tecnologías-utilizadas)
 7. [Personas Contribuyentes](#-personas-contribuyentes)
 8. [Personas Desarrolladoras del Proyecto](#-personas-desarrolladoras-del-proyecto)
-9. [Licencia](#-licencia)
+
 
 ---
 
@@ -51,7 +51,7 @@ El proyecto se encuentra actualmente **terminado y funcional**.
 * **Tutoriales Interactivos:** Capas overlay para guiar al usuario sin abandonar la página principal.
 
 ### 🔓 Acceso al Proyecto
-1. **Clona este repositorio:** `git clone https://github.com/tu-usuario/PrBank.git`
+1. **Clona este repositorio:** `git clone https://github.com/martinalex3/PrBank`
 2. **Navegador:** Abre `index.html`. Se recomienda usar un servidor local para habilitar las funcionalidades de la API.
 
 ### 🛠️ Tecnologías utilizadas
@@ -65,10 +65,9 @@ El proyecto se encuentra actualmente **terminado y funcional**.
 ### 💻 Personas Desarrolladoras del Proyecto
 Este proyecto es el resultado del trabajo conjunto de:
 * **Alejandro Martín**
-* **David Aranda (Narayan)**
+* **David Aranda**
 
-### 📜 Licencia
-Este proyecto está bajo la **Licencia MIT**.
+
 
 ---
 *© 2026 PrBank. Diseñado con Flexbox y Clean Code.*
