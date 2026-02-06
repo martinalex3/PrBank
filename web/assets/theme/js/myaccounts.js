@@ -77,6 +77,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     formAccount.onsubmit = async function(event) {
         event.preventDefault();
+        //TODO Validar el saldo mediante una RegExp
         const balance = parseFloat(document.getElementById("balance").value);
         let creditLineValue = 0;
 
@@ -240,8 +241,19 @@ async function pageLoadHandler() {
     }
 }
 
-// FUNCIÓN ASÍNCRONA DE BORRADO DE CUENTAS:
+/**
+ * FUNCIÓN ASÍNCRONA DE ACTUALIZACIÓN DE CUENTAS:
+ * @todo UPDATE: Implementar la actualización del campo description de las cuentas.
+ */
+//async function updateAccount() 
 
+
+/**
+ * FUNCIÓN ASÍNCRONA DE BORRADO DE CUENTAS:
+ * @param {type} id
+ * @return {undefined}
+ * @todo DELETE: Solo se podrán borrar cuentas que no tengan movimientos.Controlar esta condición para no realizar petición de borrado al servidor y así evitar el HTTP 500 por violación de integridad referencial.
+ */
 async function deleteAccount(id) {
     if (confirm("Are you sure you want to delete account " + id + "?")) {
         try {
@@ -261,8 +273,12 @@ async function deleteAccount(id) {
 
 //===================OTRAS  FUNCIONES=======================================
 
-// FUNCIÓN DE CALCULO DE BALANCE DE TODAS LAS CUENTAS DEL USUARIO:
-
+/**
+ * FUNCIÓN DE CALCULO DE BALANCE DE TODAS LAS CUENTAS DEL USUARIO:
+ * @param {type} accounts
+ * @return {undefined}
+ * @todo Instanciar un Array a partir de accounts y utilizar un map/reduce para calcular totalBalance.
+ */
 function totalBalanceAccounts(accounts) {
     let totalBalance = 0;
     for (let i = 0; i < accounts.length; i++) {
