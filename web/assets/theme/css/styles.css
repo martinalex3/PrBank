@@ -512,7 +512,6 @@ btn-undo:hover {
 .tabla-bancaria tbody tr:hover {
     background-color: var(--light-light-blue); /* azul clarito al pasar el mouse */
     color: white;                        /* letras blancas al hover */
-    cursor: pointer;
 }
 /*==========================
    ALINEAR AMOUNT Y BALANCE (CUENTAS)
