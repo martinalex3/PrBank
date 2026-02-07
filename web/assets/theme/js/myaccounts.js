@@ -77,7 +77,17 @@ document.addEventListener("DOMContentLoaded", function() {
 
     formAccount.onsubmit = async function(event) {
         event.preventDefault();
-        //TODO Validar el saldo mediante una RegExp
+        //TODO Validar el formato de los importes mediante la siguiente RegExp
+        const esAmountRegex = /^(?:\d{1,15}|\d{1,3}(?:\.\d{3}){1,4})(?:,\d{1,2})?$/;
+        /* Explicación de esAmountRegex
+        ^
+            (?:                         # integer part options
+               \d{1,15}                 # 1 to 15 digits without thousand separator
+             | \d{1,3}(?:\.\d{3}){1,4}  # 1–3 digits, then 1–4 groups of ".ddd"
+            )
+            (?:,\d{1,2})?               # optional decimal with 1 or 2 digits
+            $
+         */
         const balance = parseFloat(document.getElementById("balance").value);
         let creditLineValue = 0;
 
@@ -243,7 +253,7 @@ async function pageLoadHandler() {
 
 /**
  * FUNCIÓN ASÍNCRONA DE ACTUALIZACIÓN DE CUENTAS:
- * @todo UPDATE: Implementar la actualización del campo description de las cuentas.
+ * @FIXME UPDATE: Implementar la actualización del campo description de las cuentas.
  */
 //async function updateAccount() 
 
@@ -277,7 +287,7 @@ async function deleteAccount(id) {
  * FUNCIÓN DE CALCULO DE BALANCE DE TODAS LAS CUENTAS DEL USUARIO:
  * @param {type} accounts
  * @return {undefined}
- * @todo Instanciar un Array a partir de accounts y utilizar un map/reduce para calcular totalBalance.
+ * @todo Utilizar una operación agregada, por ejemplo map/reduce, sobre accounts para calcular totalBalance en lugar de una iteración.
  */
 function totalBalanceAccounts(accounts) {
     let totalBalance = 0;
