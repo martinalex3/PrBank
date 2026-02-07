@@ -1,5 +1,5 @@
-/* * To change this license header, choose License Headers in Project Properties
- * To change this template file, choose Tools | Templates
+/** 
+ * @todo:  Calcular y mostrar el valor agregado del total de los ingresos y de los gastos.
  */
 // ======================== CONSTANTES Y VARIABLES GLOBALES ====================
 // ARRAY FECHAS CORRECTAS 
@@ -19,6 +19,7 @@ document.addEventListener("DOMContentLoaded", function(){
     buildMovementsTable();
     updateAccountInfo();
     syncAccountBalance();
+    //TODO No tiene sentido pasar el saldo de la cuenta al saldo inicial y guardarlo en la sesión en la carga de la página de movimientos.
     // GUARDAR EL BALANCE INICIAL DE LA CUENTA
     const initialBalance = parseFloat(sessionStorage.getItem("account.balance")) || 0;
     sessionStorage.setItem("account.initialBalance", initialBalance);
@@ -145,7 +146,15 @@ async function createMovement(evt) {
     try {
         const tfAmount = document.getElementById("tfAmount");
         const rbDeposit = document.getElementById("rbDeposit");
-
+        //TODO Utilizar la siguiente RegExp para validar que el importe pueda introducirse con separador de decimales y de miles.
+        // const esAmountRegex = /^(?:\d{1,15}|\d{1,3}(?:\.\d{3}){1,4})(?:,\d{1,2})?$/;
+        /* Explanation for esAmountRegex:
+          (?:                                # integer part options
+            \d{1,15}                         # 1 to 15 digits without thousand separator
+            | \d{1,3}(?:\.\d{3}){1,4}        # 1–3 digits, then 1–4 groups of ".ddd"
+           )
+          (?:,\d{1,2})?                      # optional decimal with 1 or 2 digits
+         */
         let amountValue = parseFloat(tfAmount.value);
         if (isNaN(amountValue) || amountValue <= 0) {
             alert("Please enter a valid positive amount.");
@@ -168,7 +177,7 @@ async function createMovement(evt) {
                 return;
             }
         }
-
+        //FIXME Instanciar un objeto Movement y utilizar su constructor para inicializarlo.
         const newMovement = {
             id: null,
             amount: amountValue,
