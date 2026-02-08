@@ -253,7 +253,7 @@ async function pageLoadHandler() {
 
 /**
  * FUNCIÓN ASÍNCRONA DE ACTUALIZACIÓN DE CUENTAS:
- * @FIXME UPDATE: Implementar la actualización del campo description de las cuentas.
+ * @fixme UPDATE: Implementar la actualización del campo description de las cuentas, independientemente de su tipo, y, además del campo creditLine para las de crédito.
  */
 //async function updateAccount() 
 
@@ -262,7 +262,7 @@ async function pageLoadHandler() {
  * FUNCIÓN ASÍNCRONA DE BORRADO DE CUENTAS:
  * @param {type} id
  * @return {undefined}
- * @todo DELETE: Solo se podrán borrar cuentas que no tengan movimientos.Controlar esta condición para no realizar petición de borrado al servidor y así evitar el HTTP 500 por violación de integridad referencial.
+ * @fixme DELETE solo se podrán borrar cuentas que no tengan movimientos.Controlar esta condición para no realizar petición de borrado al servidor y así evitar el HTTP 500 por violación de integridad referencial.
  */
 async function deleteAccount(id) {
     if (confirm("Are you sure you want to delete account " + id + "?")) {
