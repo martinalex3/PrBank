@@ -18,7 +18,7 @@ let movements = [];
 document.addEventListener("DOMContentLoaded", function(){
     buildMovementsTable();
     updateAccountInfo();
-    syncAccountBalance();
+    //syncAccountBalance();
     // GUARDAR EL BALANCE INICIAL DE LA CUENTA
     const initialBalance = parseFloat(sessionStorage.getItem("account.balance")) || 0;
     sessionStorage.setItem("account.initialBalance", initialBalance);
@@ -194,7 +194,7 @@ async function createMovement(evt) {
         }
 
         account.balance = newBalance;
-        await syncAccountBalance(account.id);
+        await syncAccountBalance(account.id, newBalance);
 
         await buildMovementsTable();
         updateAccountInfo();
