@@ -124,7 +124,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
             nuevaCuenta = {
                 id: Math.floor(Math.random() * 100000000), // ID ALEATORIO TEMPORAL
-                description: document.getElementById("description").value,
+                description: document.getElementById("description").value, // description tf
                 balance: balance,
                 creditLine: creditLineValue,
                 beginBalance: balance,
