@@ -8,113 +8,91 @@ and open the template in the editor.
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="assets/theme/images/icon.png" type="image/x-icon">
+    <link rel="shortcut icon" href="assets/images/icon.png" type="image/x-icon">
     <title>Cuentas - PrBank</title>
-    <link rel="stylesheet" href="assets/theme/css/styles.css">
+    <link rel="stylesheet" type ="text/css" href="assets/theme/css/styles.css">
+    <link rel="alternate stylesheet"  type ="text/css" href="assets/theme/css/styles2.css" title = "Estilo Oscuro"> 
     <script src="assets/h5p-player/main.bundle.js"></script>
     <script src="assets/theme/js/myaccounts.js"></script>
-    <script src="assets/theme/js/model.js"></script>
 </head>
 <body>
-
     <header class="header-bar">
-        <nav role="navigation" aria-label="main navigation">
-        <div class="header-content">
-            <h1>PrBank</h1>
-            <button class="header-link" onclick="goHome()">Return to Index</button>
-            <div class="header-actions">
-                <button class="logout-link" onclick="logout()">Sign Out</button>
+        <nav role="navigation" aria-label="Navegación principal">
+            <div class="header-content">
+                <h1>PrBank</h1>
+                <button class="header-link" onclick="window.location.href='mymain.html'" aria-label="Return to Index">Return to Index</button>
+                <button class="logout-link" onclick="sessionStorage.clear(); window.location.href='index.html'" aria-label="Sign Out">Sign Out</button>
             </div>
-        </div>
+        </nav>
     </header>
-    
-    <div style="text-align: right; margin-top: 30px; margin-right: 20px;">
-        <button class="help-link">Need Help?</button>
+
+    <div style="text-align: right; margin: 20px 20px 0 0;">
+        <button class="help-link" aria-label="Help Tutorial">Need Help?</button>
     </div>
 
     <section class="bienvenida">
-    <h2>Welcome, <span id="userNameDisplay">User</span>!</h2> <p>Manage your accounts securely.</p>
-</section>
-        
-    <main>
-        <div class="total-balance" style="padding: 20px; text-align: right; font-size: 1.2em;">
-            <strong>Global balance: </strong> <span id="totalBalanceTop">0,00 €</span>
+        <h2>Welcome, <span id="userNameDisplay">User</span>!</h2>
+        <div class="account-balance">
+            Global Balance: <span id="totalBalanceTop" class="balance-destacado">0,00 €</span>
         </div>
-                
-        <div class="contenedor-central">
-            <div class="recuadro-principal" style="width: 95%; flex-direction: column;">
-                
-                <div style="text-align: left; width: 100%; margin-bottom: 15px;">
-                    <button id="btnNuevaCuenta" class="iniciar">
-                        + New account
-                    </button>
-                </div>
+    </section>
 
-                <table class="tabla-bancaria" role ="table" aria-label="Accounts Table">
+    <main class="contenedor-central">
+        <div class="recuadro-principal" style="width: 95%; flex-direction: column; align-items: center;">
+            
+            <button id="btnNuevaCuenta" class="iniciar" style="margin-bottom: 25px; min-width: 200px;">
+                + New Account
+            </button>
+
+            <div style="display: flex; justify-content: center; width: 100%;">
+                <table class="tabla-bancaria" role="grid" style="margin: 0 auto; width: 100%;">
                     <thead>
-                        <tr>
+                        <tr role="row">
                             <th scope="col">ID</th>
                             <th scope="col">Description</th>
                             <th scope="col">Type</th>
                             <th scope="col">Credit Line</th>
-                            <th scope="col">Timestamp</th>
-                            <th scope="col">Begin Balance</th>
-                            <th scope="col">Balance</th>
+                            <th scope="col">Created Date</th>
+                            <th scope="col">Initial Balance</th>
+                            <th scope="col">Current Balance</th>
                             <th scope="col">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody"></tbody>
                 </table>
+            </div>
 
-                <div class="total-balance" style="padding: 20px; text-align: right; font-size: 1.2em;">
-                    <strong>Global balance: </strong> <span id="totalBalanceBottom">0,00 €</span>
-                </div>
+            <div style="width: 100%; text-align: right; margin-top: 20px;">
+                Total: <span id="totalBalanceBottom" class="balance-destacado">0,00 €</span>
             </div>
         </div>
 
-        <div id="formLayer" class="capa-overlay" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="newaccountTitle">
-            <div class="recuadro-principal" style="max-width: 420px;">
-                <h3 id="newaccountTitle">Create new account</h3>
+        <div id="formLayer" class="capa-overlay" style="display:none;" role="dialog" aria-modal="true">
+            <div class="recuadro-principal" style="max-width: 450px; flex-direction: column;">
+                <h3 id="newaccountTitle">Account Details</h3>
                 <form id="formAccount">
-                    <input type="text" id="description" placeholder="Account description" required style="width:100%; margin-bottom:12px; padding:10px;">
-                    <input type="number" id="balance" placeholder="Initial balance" required style="width:100%; margin-bottom:12px; padding:10px;">
-                    <select id="type" style="width:100%; margin-bottom:20px; padding:10px;">
+                    <label for="description">Description:</label>
+                    <input type="text" id="description" required style="width:100%; margin-bottom:15px; padding:8px;">
+                    <div id="balanceGroup">
+                        <label for="balance">Initial Balance (€):</label>
+                        <input type="number" id="balance" step="0.01" style="width:100%; margin-bottom:15px; padding:8px;">
+                    </div>
+                    <label for="type">Type:</label>
+                    <select id="type" style="width:100%; margin-bottom:15px; padding:8px;">
                         <option value="0">STANDARD</option>
                         <option value="1000">CREDIT</option>
                     </select>
-                   <div id="creditLineContainer" style="display: none;">
-                         <label>Credit Line Amount:</label>
-                         <input type="number" id="creditLineInput" step="0.01" min="0.01" placeholder="Must be greater than 0" style="width:100%; margin-bottom:12px; padding:10px;">
+                    <div id="creditLineContainer" style="display: none;">
+                        <label for="creditLineInput">Credit Limit (€):</label>
+                        <input type="number" id="creditLineInput" step="0.01" style="width:100%; margin-bottom:15px; padding:8px;">
                     </div>
-                    <div class="botones">
-                        <button type="submit" class="iniciar">Save</button>
-                        <button type="button" id="btnClose" class="cancelar">Cancel</button>
+                    <div class="botones" style="display:flex; gap:10px; flex-direction: row;">
+                        <button type="submit" class="iniciar" style="flex:1;">Save</button>
+                        <button type="button" id="btnClose" class="cancelar" style="flex:1;">Cancel</button>
                     </div>
                 </form>
             </div>
         </div>
-
-        <div id="videoLayer" class="capa-overlay" style="display:none;" role="dialog" aria-modal="true">
-            <div class="recuadro-principal" style="max-width: 900px; width: 95%;">
-                <h3>Help & Tutorial</h3>
-                <div id="h5p-container" style="width: 100%; min-height: 500px; background: #f9f9f9;"></div>
-                <div class="botones" style="margin-top: 15px;">
-                    <button type="button" id="btnCloseVideo" class="cancelar">Close Help</button>
-                </div>
-            </div>
-        </div>
-
     </main>
-
-    <script>
-        function goHome() { window.location.href = "mymain.html"; }
-        function logout() { sessionStorage.clear(); window.location.href = "index.html"; }
-    </script>
-    
-    <footer>
-        <p>© 2026 PrBank. All Rights Reserved.</p>
-        <p>Alejandro Martín, Kenneth León, David Aranda.</p>
-    </footer>
-    
 </body>
 </html>

@@ -163,6 +163,50 @@ button:focus, .header-link:focus, .logout-link:focus, .help-link:focus {
     outline: 3px solid #1976d2;
     outline-offset: 2px;
 }
+
+/* --- ESTILOS PARA LA PÁGINA DE CUENTAS (ACCESIBLES) --- */
+
+/* Centrado de celdas y alineación */
+.tabla-bancaria th, 
+.tabla-bancaria td {
+    text-align: center; 
+    vertical-align: middle;
+    padding: 12px 8px;
+}
+
+/* Excepción: Descripción a la izquierda para mejor lectura */
+.tabla-bancaria td.txt-left {
+    text-align: left;
+    padding-left: 15px;
+}
+
+/* Formato de Balances (Azul y Negrita) */
+.balance-destacado {
+    color: #007bff !important;
+    font-weight: bold !important;
+}
+
+/* Contenedor de botones con espaciado uniforme */
+.acciones-fila {
+    display: flex;
+    gap: 15px; /* Distancia igual entre Movements, Edit y Delete */
+    justify-content: center;
+    align-items: center;
+}
+
+/* Ajuste para que los botones tengan un tamaño base similar */
+.acciones-fila button {
+    min-width: 90px;
+    padding: 8px 12px;
+}
+
+/* Accesibilidad: Mejora el foco cuando se tabula con Orca */
+button:focus, input:focus, select:focus {
+    outline: 3px solid #ffcc00; /* Color llamativo para saber dónde está el cursor */
+    outline-offset: 2px;
+}
+
+
 /* =========================
    MENSAJE DE BIENVENIDA
    ========================= */
@@ -496,6 +540,55 @@ btn-undo:hover {
   background-color: var(--blue-dark); /* Azul oscuro */
   color: white;
 }
+
+/* ESTILO BOTÓN EDIT NARANJA */
+.btn-edit {
+    background-color: orange !important;
+    border: 1px solid darkorange !important;
+    color: white !important;
+    border-radius: 4px;
+    padding: 6px 12px;
+    cursor: pointer !important;
+}
+
+.btn-edit:hover {
+    background-color: darkorange !important;
+}
+
+/* CONTROL DE CURSORES: Solo botones y enlaces son interactivos */
+.tabla-bancaria tbody tr {
+    cursor: default !important;
+}
+
+.tabla-bancaria button,
+.iniciar,
+.volver,
+.help-link,
+.logout-link,
+.header-link,
+.movbutton,
+.borbutton {
+    cursor: pointer !important;
+}
+
+/* Alineaciones de celdas según tu tabla */
+.tabla-bancaria td:nth-child(4),
+.tabla-bancaria td:nth-child(6),
+.tabla-bancaria td:nth-child(7),
+.tabla-bancaria th:nth-child(4),
+.tabla-bancaria th:nth-child(6),
+.tabla-bancaria th:nth-child(7) {
+    text-align: right;
+    padding-right: 12px;
+}
+
+/* Aseguramos que los botones dentro de la tabla tengan buen aspecto */
+.tabla-bancaria .iniciar, .tabla-bancaria .volver {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+}
+
+
 /*==========================
    FILAS DE LAS TABLAS 
 ============================*/
@@ -512,6 +605,7 @@ btn-undo:hover {
 .tabla-bancaria tbody tr:hover {
     background-color: var(--light-light-blue); /* azul clarito al pasar el mouse */
     color: white;                        /* letras blancas al hover */
+    cursor: pointer;
 }
 /*==========================
    ALINEAR AMOUNT Y BALANCE (CUENTAS)

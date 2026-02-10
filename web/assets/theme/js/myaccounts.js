@@ -3,6 +3,11 @@
 const SERVICE_URL = "/CRUDBankServerSide/webresources/account/customer/";
 const ACCOUNT_URL = "/CRUDBankServerSide/webresources/account/";
 
+// Variables de estado para Edición y Accesibilidad (Se mantienen para que funcione el botón Edit)
+var editMode = false;           
+var currentAccountData = null;  
+var lastFocusedElement = null;  
+
 // ====================INICIALIZACIÓN DE LA INTERFAZ============================
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -17,7 +22,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const creditContainer = document.getElementById("creditLineContainer");
     const creditInput = document.getElementById("creditLineInput");
     
-//LÓGICA MOSTRAR/OCULTAR CAMPO "LÍNEA DE CREDITO" SEGÚN TIPO DE CUENTA:
+// LÓGICA MOSTRAR/OCULTAR CAMPO "LÍNEA DE CREDITO" SEGÚN TIPO DE CUENTA:
 
     typeSelect.addEventListener("change", function() {
         if (typeSelect.value === "1000") { // CRÉDITO
@@ -25,14 +30,20 @@ document.addEventListener("DOMContentLoaded", function() {
             creditInput.required = true;
             creditInput.setAttribute("min", "50");
         } else {
-            creditContainer.style.display = "none"; //STANDARD
+            creditContainer.style.display = "none"; // STANDARD
             creditInput.required = false;
             creditInput.value = "";
         }
     });
+
 // ABRIR CAPA DE CUENTA NUEVA:
 
     document.getElementById("btnNuevaCuenta").onclick = function() {
+        lastFocusedElement = document.activeElement; 
+        editMode = false; // Reset modo edición
+        formAccount.reset();
+        document.getElementById("balanceGroup").style.display = "block"; 
+        creditContainer.style.display = "none";
         formLayer.style.display = "flex";
     };
 
@@ -42,6 +53,7 @@ document.addEventListener("DOMContentLoaded", function() {
         formLayer.style.display = "none";
         formAccount.reset();
         creditContainer.style.display = "none";
+        if (lastFocusedElement) lastFocusedElement.focus();
     };
 
 // ==============CONTROLES VIDEO DE AYUDA (H5P)=================================
@@ -53,11 +65,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
     document.querySelector(".help-link").onclick = function(e) {
         e.preventDefault();
+        lastFocusedElement = document.activeElement;
         videoLayer.style.display = "flex";
 
         if (!h5pInstance) {
-            const options = { // INDICAMOS LAS RUTAS PARA QUE LA APLICACION TENGA ACCESO A ASSETS DE H5P
-                h5pJsonPath: '/PrBank/assets/h5p-content',
+            const options = { 
                 h5pJsonPath: '/PrBank/assets/h5p-content',
                 frameJs: '/PrBank/assets/h5p-player/frame.bundle.js',
                 frameCss: '/Prbank/assets/h5p-player/styles/h5p.css',
@@ -67,20 +79,21 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     };
 
-    btnCloseVideo.onclick = function() {
-        videoLayer.style.display = "none";
-        h5pContainer.innerHTML = ""; // LIMPIA EL CONTENEDOR AL CERRAR
-        h5pInstance = null;
-    };
+    if (btnCloseVideo) {
+        btnCloseVideo.onclick = function() {
+            videoLayer.style.display = "none";
+            h5pContainer.innerHTML = ""; 
+            h5pInstance = null;
+            if (lastFocusedElement) lastFocusedElement.focus();
+        };
+    }
 
-// ENVIO DEL FORMULARIO (POST):
+// ENVIO DEL FORMULARIO (POST/PUT):
 
     formAccount.onsubmit = async function(event) {
         event.preventDefault();
-        const balance = parseFloat(document.getElementById("balance").value);
+        const balance = parseFloat(document.getElementById("balance").value) || 0;
         let creditLineValue = 0;
-
-// VALIDACIÓN DE LA CUENTA DE CRÉDITO:
 
         if (typeSelect.value === "1000") {
             creditLineValue = parseFloat(creditInput.value);
@@ -90,57 +103,60 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         }
 
-// OBTENCIÓN DEL ID Y LIMPIEZA DEL ID DEL CLIENTE DESDE LA SESIÓN:
-
         const custIdRaw = sessionStorage.getItem("customer.id");
         if (!custIdRaw) {
             alert("Session expired. Please log in again.");
             window.location.href = "index.html";
             return;
         }
-// ELIMINACIÓN DE CARACTERES PROBLEMÁTICOS COMO PUNTOS Y COMAS:
-
         const idLimpio = parseInt(custIdRaw.replace(/[,.]/g, ""));
 
+        let nuevaCuenta;
+        if (editMode && currentAccountData) {
+            // EDICIÓN: Copiamos datos originales y actualizamos
+            nuevaCuenta = JSON.parse(JSON.stringify(currentAccountData));
+            nuevaCuenta.description = document.getElementById("description").value;
+            nuevaCuenta.creditLine = creditLineValue;
+            delete nuevaCuenta.movements; 
+        } else {
+            
 // CREACIÓN DEL OBJETO CUENTA PARA EL SERVIDOR:
 
-        const nuevaCuenta = {
-            id: Math.floor(Math.random() * 100000000), // ID ALEATORIO TEMPORAL
-            description: document.getElementById("description").value,
-            balance: balance,
-            creditLine: creditLineValue,
-            beginBalance: balance,
-            beginBalanceTimestamp: new Date().toISOString().split('.')[0] + "Z", // FORMATO DE FECHA ISO SEGÚN LAS REGLAS DEL BACKEND
-            "customers": [{ "id": idLimpio }]
-        };
+            nuevaCuenta = {
+                id: Math.floor(Math.random() * 100000000), // ID ALEATORIO TEMPORAL
+                description: document.getElementById("description").value,
+                balance: balance,
+                creditLine: creditLineValue,
+                beginBalance: balance,
+                beginBalanceTimestamp: new Date().toISOString().split('.')[0] + "Z", //FORMATO DE FECHA ISO SEGÚ NLAS REGLAS DEL BACKEND
+                customers: [{ "id": idLimpio }]
+            };
+        }
 
         try {
             const response = await fetch(ACCOUNT_URL, {
-                method: "POST",
-                headers: { 
-                    "Content-Type": "application/json", 
-                    "Accept": "application/json" 
-                },
-                body: JSON.stringify(nuevaCuenta) // CONVERTIMOS A CADENA JSON
+                method: editMode ? "PUT" : "POST",
+                headers: { "Content-Type": "application/json", "Accept": "application/json" },
+                body: JSON.stringify(nuevaCuenta)
             });
 
             if (response.ok) {
                 formLayer.style.display = "none";
                 formAccount.reset();
                 creditContainer.style.display = "none";
-                pageLoadHandler(); // LLAMAMOS ALA FUNCION DE REFRESCO.
+                pageLoadHandler(); 
+                if (lastFocusedElement) lastFocusedElement.focus();
             } else {
-                alert("Error creating account.");
+                alert("Error saving account.");
             }
         } catch (error) {
-            console.error("Error en POST:", error);
+            console.error("Error en envío:", error);
         }
     };
 });
 
 
 // ============FUNCIONES ASÍNCRONAS:=======================================================
-
 
 // FUNCION ASÍNCRONA QUE OBTIENE TODOS LOS DATOS DE CUESNTAS DEL USUARIO ACTUAL (GET):
 
@@ -153,7 +169,7 @@ async function fetchAccounts() {
     return await response.json();
 }
 
-//FUNCIÓN GENERADORA DE LA FILAS Y CELDAS DE LA TABLA SEGUN LOS DATOS DEL SERVIDOR:
+//FUNCIÓN GENERADORA DE LAS FILAS Y CELDAS DE LA TABLA SEGUN LOS DATOS DEL SERVIDOR
 
 function* userRowGenerator(accounts) {
     for (let i = 0; i < accounts.length; i++) {
@@ -165,7 +181,7 @@ function* userRowGenerator(accounts) {
             const field = fields[j];
             const td = document.createElement("td");
             let value = account[field];
-
+            
 // VALIDACIÓN POR TIPO DE CUENTA:
 
             if (field === "type") {
@@ -174,15 +190,11 @@ function* userRowGenerator(accounts) {
             else if (field === "beginBalanceTimestamp" && value) {
                 const date = new Date(value);
                 td.textContent = new Intl.DateTimeFormat("es-ES", { 
-                    day: "2-digit", month: "2-digit", year: "numeric",
-                    hour: "2-digit", minute: "2-digit", hour12: false
+                    day: "2-digit", month: "2-digit", year: "numeric"
                 }).format(date);
             }
             else if (["creditLine", "beginBalance", "balance"].includes(field)) {
-                const number = parseFloat(value || 0);
-                td.textContent = new Intl.NumberFormat("es-ES", { 
-                    style: "currency", currency: "EUR" 
-                }).format(number);
+                td.textContent = fmt(value); //MODIFICADO AHORA LLAMAMOS A LA FUNCION FMT DE FROAMTEO DE DIVISA
             }
             else {
                 td.textContent = value !== undefined ? value : "";
@@ -190,14 +202,17 @@ function* userRowGenerator(accounts) {
             tr.appendChild(td);
         }
 
+        
 // COLUMNA DE ACCIONES (BOTÓN DE MOVIMIENTOS Y BORRAR):
-
+        
         const tdAction = document.createElement("td");
+        tdAction.style.display = "flex";
+        tdAction.style.gap = "5px";
 
 // BOTÓN MOVEMENTS: GUARDA ID, BALANCE, CREDIT LINE Y REDIRIGE:
         
         const btnVer = document.createElement("button");
-        btnVer.classList.add('movbutton');
+        btnVer.className = 'movbutton';
         btnVer.textContent = "Movements";
         btnVer.onclick = function() {
             sessionStorage.setItem("account.id", account.id);
@@ -205,30 +220,48 @@ function* userRowGenerator(accounts) {
             sessionStorage.setItem("account.creditLine", account.creditLine);
             window.location.href = "mymovements.html";
         };
-        
-// BOTÓN BORRAR: LLAMA A LA FUNCIÓN DE ELIMINACIÓN:
 
+// BOTÓN EDITAR CUENTA (FIXED):
+        
+        const btnEdit = document.createElement("button");
+        btnEdit.className = 'btn-edit'; 
+        btnEdit.textContent = "Edit";
+        btnEdit.onclick = function() {
+            lastFocusedElement = document.activeElement;
+            editMode = true;
+            currentAccountData = account;
+            document.getElementById("description").value = account.description;
+            document.getElementById("balanceGroup").style.display = "none";
+            document.getElementById("type").value = account.creditLine > 0 ? "1000" : "0";
+            document.getElementById("creditLineContainer").style.display = account.creditLine > 0 ? "block" : "none";
+            document.getElementById("creditLineInput").value = account.creditLine;
+            document.getElementById("formLayer").style.display = "flex";
+        };
+
+        // BOTÓN BORRAR: LLAMA A LA FUNCIÓN DE ELIMINACIÓN:
+        
         const btnBorrar = document.createElement("button");
-        btnBorrar.classList.add('borbutton');
+        btnBorrar.className = 'borbutton';
         btnBorrar.textContent = "Delete";
         btnBorrar.onclick = function() {
             deleteAccount(account.id);
         };
         
         tdAction.appendChild(btnVer);
+        tdAction.appendChild(btnEdit);
         tdAction.appendChild(btnBorrar);
         tr.appendChild(tdAction);
         yield tr; // RETORNA LA FILA Y PAUSA EJECUCIÓN
     }
 }
 
-
 // FUNCIÓN ASÍNCRONA DE CARGA DE LA PÁGINA:
 
 async function pageLoadHandler() {
     try {
-        const accounts = await fetchAccounts();
-        totalBalanceAccounts(accounts); // ACTUALIZA EL SUMATORIO TOTAL
+        const accountsData = await fetchAccounts();
+        const accounts = Array.isArray(accountsData) ? accountsData : [accountsData];
+        totalBalanceAccounts(accounts); //  ACTUALIZA EL SUMATORIO TOTAL
         const tbody = document.querySelector("#tableBody");
         tbody.innerHTML = ""; // LIMPIEZA DE DATOS PREVIOS DE LA TABLA
         const rowGenerator = userRowGenerator(accounts);
@@ -250,7 +283,7 @@ async function deleteAccount(id) {
                 pageLoadHandler();
             } else {
                 // MENSAJE DE CONFIRMACIÓN EN CASO DE ERROR (POR MOVIMIENTOS ASOCIADOS)
-                alert("This account cannot be deleted because it has associated movements. Please delete the movements first.");
+                alert("This account cannot be deleted because it has associated movements.");
             }
         } catch (error) {
             console.error("Delete error:", error);
@@ -259,27 +292,27 @@ async function deleteAccount(id) {
     }
 }
 
-//===================OTRAS  FUNCIONES=======================================
+//===================OTRAS FUNCIONES=======================================
 
-// FUNCIÓN DE CALCULO DE BALANCE DE TODAS LAS CUENTAS DEL USUARIO:
+// FORMATEO DE DIVISA E IMPORTES DEL BALANCE  (RECODIFICADO):
+
+function fmt(v) {
+    return new Intl.NumberFormat("es-ES", { style: "currency", currency: "EUR" }).format(v || 0);
+}
 
 function totalBalanceAccounts(accounts) {
     let totalBalance = 0;
     for (let i = 0; i < accounts.length; i++) {
         totalBalance += (parseFloat(accounts[i].balance) || 0);
     }
-
-// FORMATEO DE DIVISA E IMPORTES DEL BALANCE:
-
-    const formateador = new Intl.NumberFormat("es-ES", {
-        style: "currency",
-        currency: "EUR"
-    }).format(totalBalance);
-    
+    const formateador = fmt(totalBalance);
     const txtTop = document.getElementById("totalBalanceTop");
     const txtBottom = document.getElementById("totalBalanceBottom");
     
-    if (txtTop) txtTop.textContent = formateador;
+    if (txtTop) {
+        txtTop.textContent = formateador;
+        txtTop.setAttribute("aria-live", "polite"); // Accesibilidad para saldo
+    }
     if (txtBottom) txtBottom.textContent = formateador;
 }
 
@@ -289,12 +322,10 @@ function displayUserData() {
     const firstName = sessionStorage.getItem("customer.firstName");
     const lastName = sessionStorage.getItem("customer.lastName");
     const displayElement = document.getElementById("userNameDisplay");
-
     if (displayElement && firstName && lastName) {
         displayElement.textContent = firstName + " " + lastName;
     }
 }
-
   /**
  * //FUNCIÓN PARA PARSEAR DATOS EN XML (NO NECESARIA YA UTILIZAMOS JSON)
  */

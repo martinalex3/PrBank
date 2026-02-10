@@ -1,0 +1,194 @@
+/* =========================
+   VARIABLES Globales (Versión Oscura)
+   ========================= */
+:root {
+    --blue-dark: #1a1a1a;       /* Fondo casi negro */
+    --blue-light: #3700b3;      /* Acento violeta/azul profundo */
+    --soft-bg: #121212;         /* Fondo de página oscuro */
+    --white: #1e1e1e;           /* Color de tarjetas/recuadros (gris muy oscuro) */
+    --light-light-blue: #33444c; /* Gris azulado para hovers */
+    --text-main: #e0e0e0;       /* Texto principal */
+    --accent-color: #bb86fc;    /* Color de realce para enlaces y focos */
+}
+
+/* =========================
+   ESTILOS GENERALES
+   ========================= */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background: var(--soft-bg);
+    color: var(--text-main);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* =========================
+   HEADER
+   ========================= */
+header {
+    width: 100%;
+    background-color: #000000; /* Negro puro para el header */
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    border-bottom: 1px solid #333;
+}
+
+.header-content h1 {
+    margin: 0;
+    color: var(--accent-color); /* Título con color de acento */
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.header-link, .logout-link {
+    color: #cf6679; /* Color suave para acciones de salida/links */
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+/* =========================
+   ACCESIBILIDAD
+   ========================= */
+a.header-link, a.logout-link, a.help-link {
+    color: var(--accent-color);
+}
+
+button:focus, .header-link:focus, .logout-link:focus {
+    outline: 3px solid var(--accent-color);
+}
+
+.capa-overlay {
+    background-color: rgba(0,0,0,0.8); /* Más oscuro para el fondo modal */
+}
+
+/* =========================
+   BIENVENIDA Y CONTENEDORES
+   ========================= */
+.bienvenida h2 {
+    color: var(--accent-color);
+}
+
+.bienvenida p {
+    color: #bbb;
+}
+
+.recuadro-principal {
+    background: var(--white);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    border: 1px solid #333;
+}
+
+/* =========================
+   TARJETAS
+   ========================= */
+.card {
+    background: #252525;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    border: 1px solid #333;
+}
+
+.card:hover {
+    background: #2c2c2c;
+    box-shadow: 0 18px 40px rgba(0,0,0,0.6);
+}
+
+.card-title {
+    color: var(--accent-color);
+}
+
+.card img {
+    filter: brightness(0.8) grayscale(0.2); /* Suaviza imágenes brillantes */
+}
+
+/* =========================
+   TABLAS BANCARIAS
+   ========================= */
+.tabla-bancaria th {
+    color: var(--accent-color);
+    border-bottom: 2px solid #444;
+}
+
+/* Filas de las tablas */
+.tabla-bancaria tbody tr:nth-child(odd) {
+    background-color: #1a1a1a; 
+    color: #eee;
+}
+
+.tabla-bancaria tbody tr:nth-child(even) {
+    background-color: #242424;
+    color: #eee;
+}
+
+.tabla-bancaria tbody tr:hover {
+    background-color: var(--light-light-blue);
+}
+
+/* Botones dentro de tablas */
+.movbutton, .borbutton {
+    border-radius: 4px;
+    padding: 6px 12px;
+}
+
+.tabla-bancaria tr:nth-child(odd) .movbutton,
+.tabla-bancaria tr:nth-child(odd) .borbutton {
+    background-color: var(--accent-color);
+    color: #000;
+}
+
+.tabla-bancaria tr:nth-child(even) .movbutton,
+.tabla-bancaria tr:nth-child(even) .borbutton {
+    background-color: #03dac6; /* Un color cyan suave para variar */
+    color: #000;
+}
+
+/* =========================
+   FORMULARIOS
+   ========================= */
+#tfEmail, #tfPassword {
+    background-color: #2c2c2c;
+    color: white;
+    border: 1px solid #444;
+}
+
+.iniciar {
+    background-color: var(--accent-color);
+    color: #000;
+    font-weight: bold;
+}
+
+.iniciar:hover {
+    background-color: #9965f4;
+}
+
+/* =========================
+   FOOTER
+   ========================= */
+footer {
+    background-color: #000000;
+    color: #888;
+    border-top: 1px solid #333;
+}
+
+.help-link {
+    color: var(--accent-color);
+}
+
+/* Ajustes de Account Info */
+.account-info, .balance-highlight, .total-balance {
+    color: var(--accent-color);
+}

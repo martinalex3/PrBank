@@ -4,80 +4,83 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="shortcut icon" href="assets/images/icon.png" type="image/x-icon">
-
   <title>Register - PrBank</title>
-
-  <!-- CSS unificado -->
   <link rel="stylesheet" href="assets/theme/css/styles.css">
-
-  <!-- JS original -->
   <script src="assets/theme/js/SignUP.js"></script>
-
+  
   <style>
-    /* Ajuste para que todos los inputs tengan el mismo estilo que el Sign In */
+    /* Estilo para los mensajes de error: Rojo, debajo del campo y sin mover todo el diseño */
+    .field-error {
+        color: #d32f2f;
+        font-size: 0.85rem;
+        display: block;
+        margin-top: -10px; /* Pegado al input anterior */
+        margin-bottom: 10px; /* Separación con el siguiente */
+        text-align: left;
+        font-weight: bold;
+    }
+    /* Mantenemos tus estilos originales de los inputs */
     .recuadro-formulario input {
         width: 100%;
         padding: 12px;
         margin-bottom: 12px;
         border: 1px solid var(--blue-dark);
         border-radius: 8px;
-        font-size: 1rem;
         box-sizing: border-box;
     }
   </style>
 </head>
 <body>
+  <header><h1>PrBank</h1></header>
 
-  <!-- HEADER -->
-  <header>
-    <h1>PrBank</h1>
-  </header>
-
-  <!-- MENSAJE DE BIENVENIDA -->
-  <section class="bienvenida">
-    <h2>Join PrBank</h2>
-    <p>Create an Account to start to manage your finance safely.</p>
-  </section>
-
-  <!-- CONTENEDOR CENTRAL -->
   <main class="contenedor-central">
     <div class="recuadro-principal">
-
       <div class="recuadro-formulario">
-        <h3>Create a new User.</h3>
-
+        <h3>Not a client? Register now.</h3>
         <form action="/CRUDBankServerSide/webresources/customer" method="POST" id="signUpForm">
+          
+          <input type="text" id="tfName" placeholder="Name" required onblur="validateField('tfName')">
+          <span id="error-tfName" class="field-error" aria-live="polite"></span>
 
-          <input type="text" name="tfName" id="tfName" placeholder="Name" required>
-          <input type="text" name="tfLastname" id="tfLastname" placeholder="Last Name" required>
-          <input type="text" name="tfMiddlelinitial" id="tfMiddlelinitial" placeholder="Middle Initial" required>
-          <input type="text" name="tfStreet" id="tfStreet" placeholder="Street" required>
-          <input type="text" name="tfCity" id="tfCity" placeholder="City" required>
-          <input type="text" name="tfState" id="tfState" placeholder="Country" required>
-          <input type="text" name="tfZip" id="tfZip" placeholder="Zip Code" required>
-          <input type="tel" name="tfPhone" id="tfPhone" placeholder="Phone Number" required>
-          <input type="email" name="tfEmail" id="tfEmail" placeholder="Email" required>
-          <input type="password" name="tfPassword" id="tfPassword" placeholder="Password" required>
-          <input type="password" name="rpassword" id="rpassword" placeholder="Repeat Password" required>
+          <input type="text" id="tfLastname" placeholder="Last Name" required onblur="validateField('tfLastname')">
+          <span id="error-tfLastname" class="field-error" aria-live="polite"></span>
+
+          <input type="text" id="tfMiddlelinitial" placeholder="Middle Initial" required onblur="validateField('tfMiddlelinitial')">
+          <span id="error-tfMiddlelinitial" class="field-error" aria-live="polite"></span>
+
+          <input type="text" id="tfStreet" placeholder="Street" required onblur="validateField('tfStreet')">
+          <span id="error-tfStreet" class="field-error" aria-live="polite"></span>
+
+          <input type="text" id="tfCity" placeholder="City" required onblur="validateField('tfCity')">
+          <span id="error-tfCity" class="field-error" aria-live="polite"></span>
+
+          <input type="text" id="tfState" placeholder="Country" required onblur="validateField('tfState')">
+          <span id="error-tfState" class="field-error" aria-live="polite"></span>
+
+          <input type="text" id="tfZip" placeholder="Zip Code" required onblur="validateField('tfZip')">
+          <span id="error-tfZip" class="field-error" aria-live="polite"></span>
+
+          <input type="tel" id="tfPhone" placeholder="Phone Number" required onblur="validateField('tfPhone')">
+          <span id="error-tfPhone" class="field-error" aria-live="polite"></span>
+
+          <input type="email" id="tfEmail" placeholder="Email" required onblur="validateField('tfEmail')">
+          <span id="error-tfEmail" class="field-error" aria-live="polite"></span>
+
+          <input type="password" id="tfPassword" placeholder="Password" required onblur="validateField('tfPassword')">
+          <span id="error-tfPassword" class="field-error" aria-live="polite"></span>
+
+          <input type="password" id="rpassword" placeholder="Repeat Password" required onblur="validateField('rpassword')">
+          <span id="error-rpassword" class="field-error" aria-live="polite"></span>
 
           <div class="botones">
             <button type="button" class="cancelar" onclick="redirectToIndex()">Cancel</button>
-            <button type="reset" class="cancelar">Delete</button>
+            <button type="reset" class="cancelar" onclick="clearAllErrors()">Delete</button>
             <button type="button" class="iniciar" onclick="handleSignUpClick(event)">Sign me Up!</button>
           </div>
-
         </form>
         <div id="responseMsg"></div>
       </div>
-
     </div>
   </main>
-
-  <!-- FOOTER -->
-  <footer>
-    <p>© 2026 PrBank - All Rights Reserved.</p>
-    <p>Alejandro Martín, Kenneth León, David Aranda.</p>
-  </footer>
-
 </body>
 </html>
