@@ -136,6 +136,7 @@ async function buildMovementsTable() {
     }
     // ACTUALIZA LOS DASTOS DE LA CUENTA EN PANTALLA AL MAS RECIENTE
     updateAccountInfo();
+    updateMovementsSummary();
 }
 // =================== CREACION DE MOVIMIENTOS ====================
 // CREACIÓN DE MOVIMIENTOS (Crud)
@@ -303,6 +304,24 @@ function updateAccountInfo() {
         balanceBottom.textContent = formattedBalance;
     }
 }
+
+// ========================== INFO OPERACION AGREGADA ======================
+function updateMovementsSummary() {
+    let depositCount = 0;
+    let paymentCount = 0;
+
+    movements.forEach(movement => {
+        if (movement.description === "Deposit") {
+            depositCount++;
+        } else if (movement.description === "Payment") {
+            paymentCount++;
+        }
+    });
+
+    document.querySelector(".deposit-count").textContent = depositCount;
+    document.querySelector(".payment-count").textContent = paymentCount;
+}
+
 // ====================== H5P ===============================================
 document.addEventListener("DOMContentLoaded", () => {
     const videoLayer = document.getElementById("videoLayer");
