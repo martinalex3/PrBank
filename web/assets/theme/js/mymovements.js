@@ -194,7 +194,7 @@ async function createMovement(evt) {
         }
 
         account.balance = newBalance;
-        await syncAccountBalance(account);
+        await syncAccountBalance(account.id);
 
         await buildMovementsTable();
         updateAccountInfo();
