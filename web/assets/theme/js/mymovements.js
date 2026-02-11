@@ -121,7 +121,17 @@ function* userRowGenerator(movements) {
 // ====================== TABLA DE MOVIMIENTOS ==================
 // FUNCION PARA CREAR TABLAS DE MOVIMIENTOS
 async function buildMovementsTable() {
-    movements = await fetchMovements();
+    //AÑADIDO EL USO DEL MODELO DE DATOS
+    const data = await fetchMovements();
+    movements = data.map(m =>
+    new Movement(
+        m.id,
+        m.amount,
+        m.description,
+        m.timestamp,
+        m.balance
+    )
+    );
     const tbody = document.querySelector("#tableBody");
     tbody.innerHTML = ""; 
     // ACTUALIZA EL BALANCE SEGUN EL ULTIMO MOVIMIENTO
@@ -169,15 +179,14 @@ async function createMovement(evt) {
                 return;
             }
         }
-
-        const newMovement = {
-            id: null,
-            amount: amountValue,
-            description: description,
-            timestamp: new Date().toISOString(),
-            balance: newBalance
-        };
-
+        // AÑADIDO EL USO DEL MODELO DE DATOS
+        const newMovement = new Movement(
+            null,
+            amountValue,
+            description,
+            new Date().toISOString(),
+            newBalance
+        );
         const response = await fetch(
             SERVICE_DEL_URL + sessionStorage.getItem("account.id"),
             {
@@ -382,3 +391,7 @@ function goToAccounts() {
 function logout() {
         window.location.href = "index.html";
     }
+
+
+/*Usar modelo de datos
+ * Usar formateo de numeros, validacion de numeros , positivo, negativo*/
