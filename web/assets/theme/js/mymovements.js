@@ -83,16 +83,16 @@ async function fetchMovements() {
     return await response.json();
 }
 // ============= GENERADOR DE FILAS DE TABLA =======================
-// GENERACION DE TABLAS CON FECHAS FORMATEADAS
+// FUNCION PARA ACTUALIZAR EL BALANCE Y EL ID DE LA CUENTA EN TODA LA INTERFAZ
 function* userRowGenerator(movements) {
     for (const movement of movements) {
         const tr = document.createElement("tr");
         ["timestamp", "description", "amount", "balance"].forEach(field => {
             const td = document.createElement("td");
             let value = movement[field];
-            // FORMATEO DE FECHA MDN (CON MINUTOS Y HORAS)
+            // FORMATEO DE FECHA
             if (field === "timestamp" && value) {
-                const date = new Date(value); // Convertimos la cadena ISO a Date
+                const date = new Date(value);
                 value = new Intl.DateTimeFormat("es-ES", { 
                     day: "2-digit",
                     month: "2-digit",
@@ -100,15 +100,20 @@ function* userRowGenerator(movements) {
                     hour: "2-digit",
                     minute: "2-digit",
                     hour12: false
-                }).format(date); // DD/MM/YYYY HH:MM
+                }).format(date);
             }
-            // FORMATEO MDN EN EUROS
+            // FORMATEO DE MONEDA
             else if (field === "amount" || field === "balance") {
-                const number = parseFloat(value);
+                const number = parseFloat(value);               
+                // USAMOS FUNCIONES PARA PONER "." Y "," EN MILES Y DECIMALES
                 value = new Intl.NumberFormat("es-ES", { 
-                    style: "currency", currency: "EUR"
+                    style: "currency", 
+                    currency: "EUR",
+                    useGrouping: true,         // <--- ESTO FUERZA EL PUNTO DE MILLAR (1.000)
+                    minimumFractionDigits: 2,  // <--- ESTO FUERZA LA COMA Y DOS DECIMALES (,00)
+                    maximumFractionDigits: 2 
                 }).format(number);
-            }
+            }    
             td.textContent = value;
             tr.appendChild(td);
         });
@@ -174,11 +179,22 @@ async function createMovement(evt) {
     evt.preventDefault();
 
     try {
-        // CAPTURA DE ELEMENOS DEL DOM
+        // CAPTURA DE ELEMENTOS DEL DOM
         const tfAmount = document.getElementById("tfAmount");
         const rbDeposit = document.getElementById("rbDeposit");
-        //VALIDACION DE ENTRADA
-        let amountValue = parseFloat(tfAmount.value);
+        const rawValue = tfAmount.value.trim(); 
+
+        // VALICACION DEL FORMATO ESTRICTO
+        // Esta regex obliga a usar puntos en los miles:
+        // ^(\d{1,3}(\.\d{3})+|(^\d{1,3}))(,\d{2})$
+        // 1.000,00 -> OK | 1000,00 -> ERROR | 100,00 -> OK
+        const regex = /^(\d{1,3}(\.\d{3})+|\d{1,3})(,\d{2})?$/;      
+        if (!regex.test(rawValue)) {
+            alert("Error: Incorrect format. Please use dots for thousands (e.g., 1.000) and a comma for decimals (e.g., ,00) if needed.");
+            return; 
+        }
+        // CONVERSION A NUMERO Y VALIDACION DE ENTRADA
+        let amountValue = parseFloat(rawValue.replace(/\./g, '').replace(',', '.'));
         if (isNaN(amountValue) || amountValue <= 0) {
             alert("Please enter a valid positive amount.");
             return;
@@ -194,13 +210,15 @@ async function createMovement(evt) {
         } else {
             description = "Payment";
             newBalance = account.balance - amountValue;
-            // VALIDACION DE LIMITE DE CREDITO
+            // VALIDACION DEL LIMITE DE CREDITO
             if (newBalance < -account.creditLine) {
-                alert("Transaction denied. Credit limit exceeded.");
+                alert("Transaction Denied. Credit Limit Exceeded.");
                 return;
             }
         }
-        // AÑADIDO EL USO DEL MODELO DE DATOS
+        // REDONDEO A 2 DECIMALES
+        newBalance = Math.round(newBalance * 100) / 100;
+        // USO DEL MODELO DE DATOS
         const newMovement = new Movement(
             null,
             amountValue,
@@ -208,7 +226,7 @@ async function createMovement(evt) {
             new Date().toISOString(),
             newBalance
         );
-        // POST AL SERVIDOR
+        //  POST AL SERVIDOR
         const response = await fetch(
             SERVICE_DEL_URL + sessionStorage.getItem("account.id"),
             {
@@ -220,20 +238,15 @@ async function createMovement(evt) {
                 body: JSON.stringify(newMovement)
             }
         );
-
-        if (!response.ok) {
-            throw new Error("Error creating movement");
-        }
-        // ACTUALIZACION Y SINCRONIZACION
+        if (!response.ok) throw new Error("Server Failed!");
+        // ACTUALIZACIÓN Y SINCRONIZACIÓN
         account.balance = newBalance;
         await syncAccountBalance(account.id, newBalance);
-        // ACTUALIZAMOS INTERFAZ
         await buildMovementsTable();
         updateAccountInfo();
-        // CIERRE DE FORMULARIO
+        // LIMPIEZA Y CIERRE DE FORMULARIO
         document.getElementById("formLayer").style.display = "none";
         document.getElementById("formAccount").reset();
-
     } catch (error) {
         // MANEJO DE ERRORES
         console.error("Create movement failed:", error);
@@ -270,6 +283,7 @@ async function deleteMovement() {
         } else {
             currentBalance += lastMovement.amount;
         }
+        currentBalance = Math.round(currentBalance * 100) / 100;
         // SINCRONIZAMOS EL NUEVO BALANCE CON EL SERVIDOR
         await syncAccountBalance(accountId, currentBalance);
         // REFRESCAMOS TABLA E INFORMACION DE CUENTA
@@ -313,28 +327,33 @@ async function syncAccountBalance(accountId, newBalance) {
         console.error("Account sync failed:", error);
     }
 }
-//====================== FUNCIONES EXTRAS ==================================
-// FUNCION PARA ACTUALIZAR EL BALANCE Y EL ID DE LA CUENTA.
+// ====================== FUNCIONES EXTRAS ==================================
+// FUNCION PARA ACTUALIZAR EL BALANCE Y EL ID DE LA CUENTA EN TODA LA INTERFAZ
 function updateAccountInfo() {
-    const accountId = sessionStorage.getItem("account.id") || "Unkown";
-    const balance = parseFloat(sessionStorage.getItem("account.balance")) || 0;
+    const accountId = sessionStorage.getItem("account.id") || "Unknown";
+    const balance = parseFloat(sessionStorage.getItem("account.balance")) || 0;  
+    // MUESTRA EL ID DE LA CUENTA
     document.getElementById("accountIdText").textContent = accountId;
-    const formattedBalance = new Intl.NumberFormat("es-ES", {
+    // FORMATEADOR PARA NUMEROS
+    const formatter = new Intl.NumberFormat("es-ES", {
         style: "currency",
-        currency: "EUR"
-    }).format(balance);
-    // BALANCE SUPERIOR
+        currency: "EUR",
+        useGrouping: true,
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+    const formattedBalance = formatter.format(balance);
+    // ACTUALIZA EL BALANCE SUPERIOR
     const balanceTop = document.getElementById("accountBalanceText");
     if (balanceTop) {
         balanceTop.textContent = formattedBalance;
     }
-    // BALANCE INFERIOR
+    // ACTUALIZA EL BALANCE INFERIOR
     const balanceBottom = document.getElementById("accountBalanceBottom");
     if (balanceBottom) {
         balanceBottom.textContent = formattedBalance;
     }
 }
-
 // ========================== INFO OPERACION AGREGADA ======================
 function updateMovementsSummary() {
     let depositCount = 0;
