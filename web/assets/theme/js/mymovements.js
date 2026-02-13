@@ -2,8 +2,6 @@
  * To change this template file, choose Tools | Templates
  */
 // ======================== CONSTANTES Y VARIABLES GLOBALES ====================
-// ARRAY FECHAS CORRECTAS 
-const isoRegex = /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}:\d{2})/;
 // PATH PARAM DEL SERVIDOR PARA OBTENER MOVIMIENTOS POR CUENTA
 const SERVICE_URL = "/CRUDBankServerSide/webresources/movement/account/";
 // PATH PARAM DEL DELETE DE MOVIMIENTOS (BORRADO POR ID)
@@ -14,7 +12,6 @@ const ACCOUNT_URL = "/CRUDBankServerSide/webresources/account/";
 let movements = [];
 // ====================== DOM CONTENT LOADED ============================
 // EJECUCION CUANDO EL HTML SE EJECUTA POR COMPLETO
-//document.addEventListener("DOMContentLoaded", () => {
 document.addEventListener("DOMContentLoaded", function(){
     buildMovementsTable();
     updateAccountInfo();
@@ -148,21 +145,45 @@ async function buildMovementsTable() {
     updateAccountInfo();
     updateMovementsSummary();
 }
+// ======================== ASYNC DE CUENTAS ===============================
+// FUNCION PARA OBTENER LOS DATOS BASICOS DE LA CUENTA DESDE SESSIONSTORAGE
+function getAccountFromStorage() {
+    return {
+        id: sessionStorage.getItem("account.id"),
+        balance: parseFloat(sessionStorage.getItem("account.balance")) || 0,
+        creditLine: parseFloat(sessionStorage.getItem("account.creditLine")) || 0
+    };
+}
+// FUNCION ASINCRONA PARA OBTENER UNA CUENTA COMPLETA DESDE EL SERVIDOR
+// SE USA ANTES DE HACER UN PUT PARA EVITAR BORRAR CAMPOS IMPORTANTES
+async function fetchAccountById(accountId) {
+    const response = await fetch(ACCOUNT_URL + accountId, {
+        method: "GET",
+        headers: { "Accept": "application/json" }
+    });
+
+    if (!response.ok) {
+        throw new Error("Error fetching account");
+    }
+
+    return await response.json();
+}
 // =================== CREACION DE MOVIMIENTOS ====================
 // CREACIÓN DE MOVIMIENTOS (Crud)
 async function createMovement(evt) {
     evt.preventDefault();
 
     try {
+        // CAPTURA DE ELEMENOS DEL DOM
         const tfAmount = document.getElementById("tfAmount");
         const rbDeposit = document.getElementById("rbDeposit");
-
+        //VALIDACION DE ENTRADA
         let amountValue = parseFloat(tfAmount.value);
         if (isNaN(amountValue) || amountValue <= 0) {
             alert("Please enter a valid positive amount.");
             return;
         }
-
+        // CALCULO DE BALANCE
         const account = getAccountFromStorage();
         let newBalance;
         let description;
@@ -173,7 +194,7 @@ async function createMovement(evt) {
         } else {
             description = "Payment";
             newBalance = account.balance - amountValue;
-
+            // VALIDACION DE LIMITE DE CREDITO
             if (newBalance < -account.creditLine) {
                 alert("Transaction denied. Credit limit exceeded.");
                 return;
@@ -187,6 +208,7 @@ async function createMovement(evt) {
             new Date().toISOString(),
             newBalance
         );
+        // POST AL SERVIDOR
         const response = await fetch(
             SERVICE_DEL_URL + sessionStorage.getItem("account.id"),
             {
@@ -202,54 +224,21 @@ async function createMovement(evt) {
         if (!response.ok) {
             throw new Error("Error creating movement");
         }
-
+        // ACTUALIZACION Y SINCRONIZACION
         account.balance = newBalance;
         await syncAccountBalance(account.id, newBalance);
-
+        // ACTUALIZAMOS INTERFAZ
         await buildMovementsTable();
         updateAccountInfo();
-
+        // CIERRE DE FORMULARIO
         document.getElementById("formLayer").style.display = "none";
         document.getElementById("formAccount").reset();
 
     } catch (error) {
+        // MANEJO DE ERRORES
         console.error("Create movement failed:", error);
     }
 }
-// ============= SINCRONIZACION DE CUENTA ====================
-// ACTUALIZA EL BALANCE DE LA CUENTA EN EL SERVIDOR
-// SE REALIZA UN GET PREVIO PARA OBTENER LA CUENTA COMPLETA
-// EVITA QUE EL PUT BORRE CAMPOS COMO description, beginBalance, customers, etc.
-async function syncAccountBalance(accountId, newBalance) {
-    try {
-        // SE RECUPERA LA CUENTA COMPLETA
-        const account = await fetchAccountById(accountId);
-
-        // MODIFICAMOS SOLO EL BALANCE
-        account.balance = newBalance;
-
-        // ENVIAMOS EL OBJETO COMPLETO MEDIANTE PUT
-        const response = await fetch(ACCOUNT_URL, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            },
-            body: JSON.stringify(account)
-        });
-
-        if (!response.ok) {
-            throw new Error("Error updating account");
-        }
-
-        // ACTUALIZAMOS EL BALANCE EN SESSIONSTORAGE
-        sessionStorage.setItem("account.balance", newBalance);
-
-    } catch (error) {
-        console.error("Account sync failed:", error);
-    }
-}
-
 // ===================== BORRADO DE MOVIMIENTOS ====================
 // FETCH CON DELETE PARA BORRADO DE MOVIMIENTOS
 // BORRADO DEL ULTIMO MOVIMIENTO Y RECALCULO DEL BALANCE
@@ -291,7 +280,39 @@ async function deleteMovement() {
         console.error("Delete movement failed:", error);
     }
 }
+// ============= SINCRONIZACION DE CUENTA ====================
+// ACTUALIZA EL BALANCE DE LA CUENTA EN EL SERVIDOR
+// SE REALIZA UN GET PREVIO PARA OBTENER LA CUENTA COMPLETA
+// EVITA QUE EL PUT BORRE CAMPOS COMO DESCRIPTION, BEGIN BALANCE, ETC...
+async function syncAccountBalance(accountId, newBalance) {
+    try {
+        // SE RECUPERA LA CUENTA COMPLETA
+        const account = await fetchAccountById(accountId);
 
+        // MODIFICAMOS SOLO EL BALANCE
+        account.balance = newBalance;
+
+        // ENVIAMOS EL OBJETO COMPLETO MEDIANTE PUT
+        const response = await fetch(ACCOUNT_URL, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify(account)
+        });
+
+        if (!response.ok) {
+            throw new Error("Error updating account");
+        }
+
+        // ACTUALIZAMOS EL BALANCE EN SESSIONSTORAGE
+        sessionStorage.setItem("account.balance", newBalance);
+
+    } catch (error) {
+        console.error("Account sync failed:", error);
+    }
+}
 //====================== FUNCIONES EXTRAS ==================================
 // FUNCION PARA ACTUALIZAR EL BALANCE Y EL ID DE LA CUENTA.
 function updateAccountInfo() {
@@ -326,63 +347,38 @@ function updateMovementsSummary() {
             paymentCount++;
         }
     });
-
     document.querySelector(".deposit-count").textContent = depositCount;
     document.querySelector(".payment-count").textContent = paymentCount;
 }
 // ====================== H5P ===============================================
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", function() {
     const videoLayer = document.getElementById("videoLayer");
     const btnCloseVideo = document.getElementById("btnCloseVideo");
     const h5pContainer = document.getElementById("h5p-container");
     let h5pInstance = null;
 
-    document.querySelector(".help-link").onclick = (e) => {
+    // ABRIR VIDEO
+    document.querySelector(".help-link").onclick = function(e) {
         e.preventDefault();
         videoLayer.style.display = "flex";
 
-        if (!h5pInstance) {
-            const options = {
-                h5pJsonPath: '/PrBank/assets/h5p-content',
-                frameJs: '/PrBank/assets/h5p-player/frame.bundle.js',
-                frameCss: '/PrBank/assets/h5p-player/styles/h5p.css',
-                librariesPath: '/PrBank/assets/h5p-libraries'
-            };
-            h5pInstance = new H5PStandalone.H5P(h5pContainer, options);
-        }
-    };
 
-    btnCloseVideo.onclick = () => {
+        const options = {
+            h5pJsonPath: '/PrBank/assets/h5p-content',
+            frameJs: '/PrBank/assets/h5p-player/frame.bundle.js',
+            frameCss: '/PrBank/assets/h5p-player/styles/h5p.css',
+            librariesPath: '/PrBank/assets/h5p-libraries'
+        };
+        h5pContainer.innerHTML = "";
+        h5pInstance = new H5PStandalone.H5P(h5pContainer, options);
+    };
+    // CERRAR PESTAÑA
+    btnCloseVideo.onclick = function() {
         videoLayer.style.display = "none";
         h5pContainer.innerHTML = "";
         h5pInstance = null;
     };
 });
-// ======================== ASYNC DE CUENTAS ===============================
-// FUNCION PARA OBTENER LOS DATOS BASICOS DE LA CUENTA DESDE SESSIONSTORAGE
-
-function getAccountFromStorage() {
-    return {
-        id: sessionStorage.getItem("account.id"),
-        balance: parseFloat(sessionStorage.getItem("account.balance")) || 0,
-        creditLine: parseFloat(sessionStorage.getItem("account.creditLine")) || 0
-    };
-}
-// FUNCION ASINCRONA PARA OBTENER UNA CUENTA COMPLETA DESDE EL SERVIDOR
-// SE USA ANTES DE HACER UN PUT PARA EVITAR BORRAR CAMPOS IMPORTANTES
-async function fetchAccountById(accountId) {
-    const response = await fetch(ACCOUNT_URL + accountId, {
-        method: "GET",
-        headers: { "Accept": "application/json" }
-    });
-
-    if (!response.ok) {
-        throw new Error("Error fetching account");
-    }
-
-    return await response.json();
-}
-
 // ======================== SCRIPTS DE NAVEGACION ============================
 function goToAccounts() {
         window.location.href = "myaccounts.html";
@@ -390,7 +386,3 @@ function goToAccounts() {
 function logout() {
         window.location.href = "index.html";
     }
-
-
-/*Usar modelo de datos
- * Usar formateo de numeros, validacion de numeros , positivo, negativo*/
