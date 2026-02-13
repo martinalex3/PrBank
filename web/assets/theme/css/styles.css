@@ -559,6 +559,77 @@ btn-undo:hover {
     text-decoration: underline;
     }
     
+/* ============================================================
+   INDEPENDENCIA TOTAL DEL HTML
+   ============================================================ */
+
+/* CONTENEDORES DE BOTONES Y ALINEACION */
+.help-button-wrapper {
+    text-align: right; 
+    margin-top: 30px; 
+    margin-right: 20px;
+}
+
+.table-main-container {
+    width: 95%; 
+    flex-direction: column;
+}
+
+.action-bar-left {
+    text-align: left; 
+    width: 100%; 
+    margin-bottom: 15px;
+}
+
+.action-bar-center {
+    text-align: center; 
+    margin-top: 20px;
+}
+
+/* MODALES Y VISIBILIDAD INICIAL */
+.hidden-init {
+    display: none;
+}
+
+.modal-small {
+    max-width: 420px;
+    width: 100%;
+}
+
+.modal-video {
+    max-width: 900px; 
+    width: 95%;
+}
+
+/* ELEMENTOS DE FORMULARIO */
+.input-form-full {
+    width: 100%; 
+    margin-bottom: 12px; 
+    padding: 10px;
+}
+
+.movement-type-flex {
+    display: flex; 
+    justify-content: space-around; 
+    margin-bottom: 20px;
+    border: none;
+}
+
+/* H5P PLAYER Y ESPACIADOS */
+.h5p-player-area {
+    width: 100%; 
+    min-height: 500px; 
+    background: #f9f9f9;
+}
+
+.spacing-top {
+    margin-top: 15px;
+}
+
+.text-center {
+    text-align: center;
+}
+
 /* =========================
    RESPONSIVE
    ========================= */

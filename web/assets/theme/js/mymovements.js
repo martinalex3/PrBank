@@ -121,19 +121,19 @@ function* userRowGenerator(movements) {
 // ====================== TABLA DE MOVIMIENTOS ==================
 // FUNCION PARA CREAR TABLAS DE MOVIMIENTOS
 async function buildMovementsTable() {
-    //AÑADIDO EL USO DEL MODELO DE DATOS
+    // AÑADIDO EL USO DEL MODELO DE DATOS
     const data = await fetchMovements();
-    movements = data.map(m =>
-    new Movement(
-        m.id,
-        m.amount,
-        m.description,
-        m.timestamp,
-        m.balance
-    )
-    );
+    movements = data.map(function(m) {
+        return new Movement(
+            m.id,
+            m.amount,
+            m.description,
+            m.timestamp,
+            m.balance
+        );
+    });
     const tbody = document.querySelector("#tableBody");
-    tbody.innerHTML = ""; 
+    tbody.innerHTML = "";
     // ACTUALIZA EL BALANCE SEGUN EL ULTIMO MOVIMIENTO
     if (movements && movements.length > 0) {
         const lastMovement = movements[movements.length - 1];
@@ -144,7 +144,7 @@ async function buildMovementsTable() {
     for (const row of rowGenerator) {
         tbody.appendChild(row);
     }
-    // ACTUALIZA LOS DASTOS DE LA CUENTA EN PANTALLA AL MAS RECIENTE
+    // ACTUALIZA LOS DATOS DE LA CUENTA EN PANTALLA AL MAS RECIENTE
     updateAccountInfo();
     updateMovementsSummary();
 }
@@ -319,7 +319,7 @@ function updateMovementsSummary() {
     let depositCount = 0;
     let paymentCount = 0;
 
-    movements.forEach(movement => {
+    movements.forEach(function(movement) {
         if (movement.description === "Deposit") {
             depositCount++;
         } else if (movement.description === "Payment") {
@@ -330,7 +330,6 @@ function updateMovementsSummary() {
     document.querySelector(".deposit-count").textContent = depositCount;
     document.querySelector(".payment-count").textContent = paymentCount;
 }
-
 // ====================== H5P ===============================================
 document.addEventListener("DOMContentLoaded", () => {
     const videoLayer = document.getElementById("videoLayer");
