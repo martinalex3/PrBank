@@ -700,12 +700,12 @@ btn-undo:hover {
 }
 
 #boton-estilo {
-    background-color: #ff9800; /* Naranja llamativo */
+    background-color: #ff9800; 
     color: #000000;
     font-weight: 600;
     border: 1.5px solid #222;
     padding: 6px 18px;
-    border-radius: 3px; /* Bordes menos redondeados (estilo más manual) */
+    border-radius: 3px; 
     cursor: pointer;
     font-family: inherit;
     transition: all 0.3s ease;
@@ -713,5 +713,5 @@ btn-undo:hover {
 
 #boton-estilo:hover {
     background-color: #e68a00;
-    box-shadow: 2px 2px 0px #333; /* Sombra sólida para que parezca diseño propio */
+    box-shadow: 2px 2px 0px #333; 
 }
