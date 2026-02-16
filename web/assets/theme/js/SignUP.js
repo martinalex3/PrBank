@@ -1,12 +1,11 @@
 /**
- * ARCHIVO: SignUP.js
- * AUTOR: David Aranda 
- * DESCRIPCIÓN: Lógica de validación y envío de registro con accesibilidad.
+ * Lógica de validación y envío de registro - PrBank
+ * @author David Aranda
  */
 
 /**
- * CONSTRUCTOR: Define cómo es un "Customer" (Cliente). 
- * Es como una plantilla para crear objetos con todos sus datos.
+ * Representa a un cliente del banco.
+ * @constructor
  */
 function Customer(id, firstName, lastName, middleInitial, street, city, state, zip, phone, email, password) {
     this.id = id;
@@ -23,140 +22,96 @@ function Customer(id, firstName, lastName, middleInitial, street, city, state, z
 }
 
 /**
- * FUNCIÓN DE APOYO: showFieldError
- * Sirve para avisar al usuario (y a Orca) si algo está mal.
- * @param {string} fieldId - El ID del input (ej: "tfName")
- * @param {string} message - El texto que queremos que lea el usuario.
+ * Gestiona la visualización de errores en los campos del formulario.
+ * @param {string} fieldId - ID del elemento input.
+ * @param {string|null} message - Mensaje de error o null para limpiar.
  */
 function showFieldError(fieldId, message) {
     const input = document.getElementById(fieldId);
     const errorSpan = document.getElementById("error-" + fieldId);
-    
     if (message) {
-        // SI HAY ERROR:
-        // 1. Marcamos el campo como inválido para que Orca lo diga en voz alta.
         input.setAttribute("aria-invalid", "true");
-        // 2. Pintamos el borde de rojo para que se vea a simple vista.
         input.style.borderColor = "#d32f2f";
-        // 3. Escribimos el mensaje en el <span> correspondiente.
-        if (errorSpan) errorSpan.textContent = message;
+        errorSpan.textContent = message;
     } else {
-        // SI NO HAY ERROR:
-        // Limpiamos todo para que el campo vuelva a su estado normal.
         input.setAttribute("aria-invalid", "false");
-        input.style.borderColor = ""; 
-        if (errorSpan) errorSpan.textContent = "";
+        input.style.borderColor = "";
+        errorSpan.textContent = "";
     }
 }
 
 /**
- * FUNCIÓN DE VALIDACIÓN: validateField
- * Se ejecuta cada vez que el usuario "sale" de un campo (onblur).
- * @param {string} id - El ID del campo que queremos revisar.
+ * Ejecuta reglas de validación sobre un campo específico.
+ * @param {string} id - ID del campo a validar.
+ * @returns {boolean} True si es válido, False en caso contrario.
  */
 function validateField(id) {
-    const input = document.getElementById(id);
-    const val = input.value.trim(); // Cogemos el texto sin espacios vacíos.
-
-    // Primero miramos si el campo está vacío (excepto la inicial que puede ser opcional a veces)
-    if (val === "" && id !== "tfMiddlelinitial") {
-        showFieldError(id, "This field is required.");
-        return false;
+    const value = document.getElementById(id).value.trim();
+    
+    // Validación de Email
+    if (id === "tfEmail") {
+        const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!regexEmail.test(value)) {
+            showFieldError(id, "Please enter a valid email.");
+            return false;
+        }
+    } 
+    // Validación de Teléfono
+    else if (id === "tfPhone") {
+        const regexPhone = /^[0-9]{9,11}$/; // Acepta entre 9 y 11 dígitos numéricos
+        if (!regexPhone.test(value)) {
+            showFieldError(id, "Phone must be between 9 and 11 numbers.");
+            return false;
+        }
     }
-
-    // Ahora aplicamos reglas especiales según el ID del campo
-    switch(id) {
-        case "tfZip":
-            // Comprobamos que sean exactamente 5 números
-            if (!/^\d{5}$/.test(val)) {
-                showFieldError(id, "Zip Code must be 5 digits.");
-                return false;
-            }
-            break;
-        case "tfPhone":
-            // Comprobamos que sean 9 números
-            if (!/^\d{9}$/.test(val)) {
-                showFieldError(id, "Phone must be 9 digits.");
-                return false;
-            }
-            break;
-        case "tfEmail":
-            // Comprobamos que tenga un formato de correo real
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(val)) {
-                showFieldError(id, "Please enter a valid email.");
-                return false;
-            }
-            break;
-        case "tfPassword":
-            // La contraseña debe tener al menos 8 letras
-            if (val.length < 8) {
-                showFieldError(id, "Min. 8 characters.");
-                return false;
-            }
-            break;
-        case "rpassword":
-            // Comparamos la segunda contraseña con la primera
-            const passOriginal = document.getElementById("tfPassword").value;
-            if (val !== passOriginal) {
-                showFieldError(id, "Passwords do not match.");
-                return false;
-            }
-            break;
-        case "tfMiddlelinitial":
-            // Solo dejamos escribir una letra en la inicial
-            if (val.length > 1) {
-                showFieldError(id, "Only 1 character allowed.");
-                return false;
-            }
-            break;
+    // Validación de repetir contraseña
+    else if (id === "rpassword") {
+        const pass = document.getElementById("tfPassword").value;
+        if (value !== pass) {
+            showFieldError(id, "Passwords do not match.");
+            return false;
+        }
+    } 
+    // Validación de Código Postal
+    else if (id === "tfZip") {
+        if (value.length < 5) {
+            showFieldError(id, "Zip code is too short.");
+            return false;
+        }
+    } 
+    // Validación de campos obligatorios generales
+    else {
+        if (value === "" && id !== "tfMiddlelinitial") {
+            showFieldError(id, "This field is required.");
+            return false;
+        }
     }
-
-    // Si ha pasado por aquí sin retornar "false", es que todo está OK.
+    
     showFieldError(id, null);
     return true;
 }
 
 /**
- * BOTÓN "Sign me Up!": handleSignUpClick
- * Repasa todo antes de enviar los datos al servidor.
+ * Procesa el registro del usuario, validando y enviando XML al servidor.
+ * @param {Event} event - Evento de click.
  */
 function handleSignUpClick(event) {
-    event.preventDefault(); // Detenemos el envío automático del formulario.
+    event.preventDefault();
 
-    // Metemos todos los IDs en una lista para revisarlos todos a la vez.
-    const allIds = [
-        "tfName", "tfLastname", "tfMiddlelinitial", "tfStreet", 
-        "tfCity", "tfState", "tfZip", "tfPhone", "tfEmail", 
-        "tfPassword", "rpassword"
-    ];
-    
-    let isAllOk = true;
+    const ids = ["tfName", "tfLastname", "tfStreet", "tfCity", "tfState", "tfZip", "tfPhone", "tfEmail", "tfPassword", "rpassword"];
+    let isFormValid = true;
 
-    // Usamos un bucle para validar cada ID de la lista.
-    allIds.forEach(id => {
+    ids.forEach(function(id) {
         if (!validateField(id)) {
-            isAllOk = false; // Si uno falla, el formulario no se envía.
+            isFormValid = false;
         }
     });
 
-    if (isAllOk) {
-        // Si todo está correcto, disparamos la petición XML.
-        sendRequestAndProcessResponse();
-    } else {
-        // Si hay errores, avisamos al usuario al final del formulario.
-        const responseMsg = document.getElementById("responseMsg");
-        responseMsg.textContent = "Please fix the red fields before submitting.";
-        responseMsg.style.color = "red";
+    if (!isFormValid) {
+        alert("Please correct the errors before submitting.");
+        return;
     }
-}
 
-/**
- * FUNCIÓN DE ENVÍO: sendRequestAndProcessResponse
- * Empaqueta los datos en XML y los manda al servidor (Backend).
- */
-function sendRequestAndProcessResponse() {
-    // Creamos el objeto Customer con lo que hay escrito en los inputs
     const customer = new Customer(
         0,
         document.getElementById("tfName").value,
@@ -171,9 +126,9 @@ function sendRequestAndProcessResponse() {
         document.getElementById("tfPassword").value
     );
 
-    // Creamos el cuerpo del mensaje en formato XML
     const xmlBody = `
         <customer>
+            <id>0</id>
             <firstName>${customer.firstName}</firstName>
             <lastName>${customer.lastName}</lastName>
             <middleInitial>${customer.middleInitial}</middleInitial>
@@ -186,7 +141,6 @@ function sendRequestAndProcessResponse() {
             <password>${customer.password}</password>
         </customer>`.trim();
 
-    // Hacemos la llamada al servidor
     const url = document.getElementById("signUpForm").action;
     
     fetch(url, {
@@ -194,32 +148,32 @@ function sendRequestAndProcessResponse() {
         headers: { 'Content-Type': 'application/xml' },
         body: xmlBody
     })
-    .then(response => {
+    .then(function(response) {
         if (response.ok) {
             alert("Registration successful!");
             window.location.href = 'signin.html';
         } else {
-            throw new Error("Registration failed. Please try again.");
+            throw new Error("Registration failed.");
         }
     })
-    .catch(error => {
+    .catch(function(error) {
         document.getElementById("responseMsg").textContent = error.message;
     });
 }
 
 /**
- * RESET: clearAllErrors
- * Limpia los bordes rojos si el usuario pulsa el botón de borrar.
+ * Limpia todos los estados de error del formulario.
  */
 function clearAllErrors() {
     const allIds = ["tfName", "tfLastname", "tfMiddlelinitial", "tfStreet", "tfCity", "tfState", "tfZip", "tfPhone", "tfEmail", "tfPassword", "rpassword"];
-    allIds.forEach(id => showFieldError(id, null));
+    allIds.forEach(function(id) {
+        showFieldError(id, null);
+    });
 }
 
 /**
- * NAVEGACIÓN: redirectToIndex
- * Vuelve a la página principal.
+ * Redirige a la página principal.
  */
 function redirectToIndex() {
-    window.location.href = 'index.html';
+    window.location.href = "index.html";
 }

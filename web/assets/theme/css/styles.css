@@ -163,50 +163,6 @@ button:focus, .header-link:focus, .logout-link:focus, .help-link:focus {
     outline: 3px solid #1976d2;
     outline-offset: 2px;
 }
-
-/* --- ESTILOS PARA LA PÁGINA DE CUENTAS (ACCESIBLES) --- */
-
-/* Centrado de celdas y alineación */
-.tabla-bancaria th, 
-.tabla-bancaria td {
-    text-align: center; 
-    vertical-align: middle;
-    padding: 12px 8px;
-}
-
-/* Excepción: Descripción a la izquierda para mejor lectura */
-.tabla-bancaria td.txt-left {
-    text-align: left;
-    padding-left: 15px;
-}
-
-/* Formato de Balances (Azul y Negrita) */
-.balance-destacado {
-    color: #007bff !important;
-    font-weight: bold !important;
-}
-
-/* Contenedor de botones con espaciado uniforme */
-.acciones-fila {
-    display: flex;
-    gap: 15px; /* Distancia igual entre Movements, Edit y Delete */
-    justify-content: center;
-    align-items: center;
-}
-
-/* Ajuste para que los botones tengan un tamaño base similar */
-.acciones-fila button {
-    min-width: 90px;
-    padding: 8px 12px;
-}
-
-/* Accesibilidad: Mejora el foco cuando se tabula con Orca */
-button:focus, input:focus, select:focus {
-    outline: 3px solid #ffcc00; /* Color llamativo para saber dónde está el cursor */
-    outline-offset: 2px;
-}
-
-
 /* =========================
    MENSAJE DE BIENVENIDA
    ========================= */
@@ -540,55 +496,6 @@ btn-undo:hover {
   background-color: var(--blue-dark); /* Azul oscuro */
   color: white;
 }
-
-/* ESTILO BOTÓN EDIT NARANJA */
-.btn-edit {
-    background-color: orange !important;
-    border: 1px solid darkorange !important;
-    color: white !important;
-    border-radius: 4px;
-    padding: 6px 12px;
-    cursor: pointer !important;
-}
-
-.btn-edit:hover {
-    background-color: darkorange !important;
-}
-
-/* CONTROL DE CURSORES: Solo botones y enlaces son interactivos */
-.tabla-bancaria tbody tr {
-    cursor: default !important;
-}
-
-.tabla-bancaria button,
-.iniciar,
-.volver,
-.help-link,
-.logout-link,
-.header-link,
-.movbutton,
-.borbutton {
-    cursor: pointer !important;
-}
-
-/* Alineaciones de celdas según tu tabla */
-.tabla-bancaria td:nth-child(4),
-.tabla-bancaria td:nth-child(6),
-.tabla-bancaria td:nth-child(7),
-.tabla-bancaria th:nth-child(4),
-.tabla-bancaria th:nth-child(6),
-.tabla-bancaria th:nth-child(7) {
-    text-align: right;
-    padding-right: 12px;
-}
-
-/* Aseguramos que los botones dentro de la tabla tengan buen aspecto */
-.tabla-bancaria .iniciar, .tabla-bancaria .volver {
-    padding: 6px 12px;
-    font-size: 0.9rem;
-}
-
-
 /*==========================
    FILAS DE LAS TABLAS 
 ============================*/
@@ -605,7 +512,6 @@ btn-undo:hover {
 .tabla-bancaria tbody tr:hover {
     background-color: var(--light-light-blue); /* azul clarito al pasar el mouse */
     color: white;                        /* letras blancas al hover */
-    cursor: pointer;
 }
 /*==========================
    ALINEAR AMOUNT Y BALANCE (CUENTAS)
@@ -653,6 +559,78 @@ btn-undo:hover {
     text-decoration: underline;
     }
     
+/* ============================================================
+   INDEPENDENCIA TOTAL DEL HTML
+   ============================================================ */
+
+/* CONTENEDORES DE BOTONES Y ALINEACION */
+.help-button-wrapper {
+    text-align: right; 
+    margin-top: 30px; 
+    margin-right: 20px;
+}
+
+.table-main-container {
+    width: 95%; 
+    flex-direction: column;
+}
+
+.action-bar-left {
+    text-align: left; 
+    width: 100%; 
+    margin-bottom: 15px;
+}
+
+.action-bar-center {
+    text-align: center; 
+    margin-top: 20px;
+}
+
+/* MODALES Y VISIBILIDAD INICIAL */
+.hidden-init {
+    display: none;
+}
+
+.modal-small {
+    max-width: 420px;
+    width: 100%;
+}
+
+.modal-video {
+    max-width: 900px; 
+    width: 95%;
+}
+
+/* ELEMENTOS DE FORMULARIO */
+.input-form-full {
+    width: 100%; 
+    margin-bottom: 12px; 
+    padding: 10px;
+}
+
+.movement-type-flex {
+    display: flex; 
+    justify-content: space-around; 
+    margin-bottom: 20px;
+    border: none;
+}
+
+/* H5P PLAYER Y ESPACIADOS */
+.h5p-player-area {
+    width: 100%; 
+    min-height: 500px; 
+    background: #f9f9f9;
+}
+
+.spacing-top {
+    margin-top: 15px;
+}
+
+.text-center {
+    text-align: center;
+}
+
+
 /* =========================
    RESPONSIVE
    ========================= */
@@ -665,4 +643,75 @@ btn-undo:hover {
     .menu-container { flex-direction: column; gap: 16px; align-items:center; }
     header h1 { font-size: 1.5rem; }
     .bienvenida h2 { font-size: 1.3rem; }
+}
+
+/* ============================================================
+   TO DO: estilo de la tabla responsiva
+   ============================================================ */
+
+@media screen and (max-width: 820px) {
+    .tabla-bancaria, 
+    .tabla-bancaria thead, 
+    .tabla-bancaria tbody, 
+    .tabla-bancaria th, 
+    .tabla-bancaria td, 
+    .tabla-bancaria tr {
+        display: block; width: 100%;
+    }
+    .tabla-bancaria thead { 
+        display: none; 
+    }
+    .tabla-bancaria tr {
+        border: 1px solid #ddd;
+        margin-bottom: 20px;  
+        border-radius: 8px;
+        background: var(--white); 
+        padding: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+    }
+    .tabla-bancaria td { 
+        text-align: right; 
+        padding: 12px !important; 
+        border-bottom: 1px solid #eee; 
+        position: relative; 
+    }
+    .tabla-bancaria td::before { 
+        font-weight: bold; color: var(--blue-dark);
+        position: absolute; left: 12px;
+        content: attr(data-label); 
+          
+    }
+    .acciones-celda { 
+        border-bottom: none; 
+        gap: 5px; 
+        display: flex; 
+        justify-content: flex-end; }
+}
+
+/* ============================================================
+   TO DO: estilos del botón de cambio de estilo
+   ============================================================ */
+.zona-herramientas {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 15px 5%;
+    gap: 12px;
+}
+
+#boton-estilo {
+    background-color: #ff9800; /* Naranja llamativo */
+    color: #000000;
+    font-weight: 600;
+    border: 1.5px solid #222;
+    padding: 6px 18px;
+    border-radius: 3px; /* Bordes menos redondeados (estilo más manual) */
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.3s ease;
+}
+
+#boton-estilo:hover {
+    background-color: #e68a00;
+    box-shadow: 2px 2px 0px #333; /* Sombra sólida para que parezca diseño propio */
 }
