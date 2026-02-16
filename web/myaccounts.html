@@ -54,25 +54,28 @@ and open the template in the editor.
                     <button id="btnNuevaCuenta" class="iniciar">+ New account</button>
                 </div>
 
-                <table class="tabla-bancaria">
+                <table class="tabla-bancaria" role ="table" aria-label="Accounts Table">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Description</th>
-                            <th>Type</th>
-                            <th>Credit Line</th>
-                            <th>Timestamp</th>
-                            <th>Begin Balance</th>
-                            <th>Balance</th>
-                            <th>Actions</th>
+                            <th scope="col">ID</th>
+                            <th scope="col">Description</th>
+                            <th scope="col">Type</th>
+                            <th scope="col">Credit Line</th>
+                            <th scope="col">Timestamp</th>
+                            <th scope="col">Begin Balance</th>
+                            <th scope="col">Balance</th>
+                            <th scope="col">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody"></tbody>
                 </table>
+                <div class="total-balance" style="padding: 20px; text-align: right; font-size: 1.2em;">
+                    <strong>Global balance: </strong> <span id="totalBalanceBottom">0,00 €</span>
+                </div>
             </div>
         </div>
 
-        <div id="formLayer" class="capa-overlay" style="display:none;">
+        <div id="formLayer" class="capa-overlay" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="newaccountTitle">
             <div class="recuadro-principal" style="max-width: 420px;">
                 <h3 id="newaccountTitle">Account Details</h3>
                 <form id="formAccount">
