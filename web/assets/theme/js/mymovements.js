@@ -109,8 +109,8 @@ function* userRowGenerator(movements) {
                 value = new Intl.NumberFormat("es-ES", { 
                     style: "currency", 
                     currency: "EUR",
-                    useGrouping: true,         // <--- ESTO FUERZA EL PUNTO DE MILLAR (1.000)
-                    minimumFractionDigits: 2,  // <--- ESTO FUERZA LA COMA Y DOS DECIMALES (,00)
+                    useGrouping: true,
+                    minimumFractionDigits: 2,
                     maximumFractionDigits: 2 
                 }).format(number);
             }    
@@ -185,8 +185,6 @@ async function createMovement(evt) {
         const rawValue = tfAmount.value.trim(); 
 
         // VALICACION DEL FORMATO ESTRICTO
-        // Esta regex obliga a usar puntos en los miles:
-        // ^(\d{1,3}(\.\d{3})+|(^\d{1,3}))(,\d{2})$
         // 1.000,00 -> OK | 1000,00 -> ERROR | 100,00 -> OK
         const regex = /^(\d{1,3}(\.\d{3})+|\d{1,3})(,\d{2})?$/;      
         if (!regex.test(rawValue)) {
