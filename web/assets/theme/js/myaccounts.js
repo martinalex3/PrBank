@@ -1,298 +1,321 @@
-// ====================VARIABLES GLOBALES (ENDPOINTS)===========================
+/**
+ * Lógica de Gestión de Cuentas - PrBank
+ * Autores: David Aranda 
+ */
 
 const SERVICE_URL = "/CRUDBankServerSide/webresources/account/customer/";
 const ACCOUNT_URL = "/CRUDBankServerSide/webresources/account/";
 
-// ====================INICIALIZACIÓN DE LA INTERFAZ============================
+var editMode = false;
+var currentAccountData = null;
 
 document.addEventListener("DOMContentLoaded", function() {
-    displayUserData(); // MOSTRAR USUARIO LOGUEADO
-    pageLoadHandler(); // CARGA INICIAL DE LA TABLA DE CUENTAS
-    
-// =====================CONTROLES FORMULARIO CUENTA=============================
-    
+    displayUserData();
+    pageLoadHandler();
+
     const formLayer = document.getElementById("formLayer");
     const formAccount = document.getElementById("formAccount");
     const typeSelect = document.getElementById("type");
     const creditContainer = document.getElementById("creditLineContainer");
     const creditInput = document.getElementById("creditLineInput");
-    
-//LÓGICA MOSTRAR/OCULTAR CAMPO "LÍNEA DE CREDITO" SEGÚN TIPO DE CUENTA:
+    const balanceInput = document.getElementById("balance");
+
+    // --- BLOQUE DE VALIDACIÓN
+    const validarEntradaMoneda = function(e) {
+        const valorOriginal = e.target.value;
+        // Solo permitimos números, puntos y comas
+        const valorLimpio = valorOriginal.replace(/[^0-9.,]/g, "");
+        
+        if (valorOriginal !== valorLimpio) {
+            alert("Only numbers and separators (period or comma) are allowed.");
+            e.target.value = valorLimpio;
+        }
+    };
+
+    balanceInput.addEventListener("input", validarEntradaMoneda);
+    creditInput.addEventListener("input", validarEntradaMoneda);
+
+    // --- SECCIÓN: AYUDA (H5P) ---
+    const helpBtn = document.querySelector(".help-link");
+    const videoLayer = document.getElementById("videoLayer");
+    const h5pContainer = document.getElementById("h5p-container");
+    const btnCloseVideo = document.getElementById("btnCloseVideo");
+    let h5pInstance = null;
+
+    if (helpBtn) {
+        helpBtn.onclick = function(e) {
+            e.preventDefault();
+            videoLayer.style.display = "flex";
+            if (!h5pInstance) {
+                const options = { 
+                    h5pJsonPath: '/PrBank/assets/h5p-content',
+                    frameJs: '/PrBank/assets/h5p-player/frame.bundle.js',
+                    frameCss: '/PrBank/assets/h5p-player/styles/h5p.css',
+                    librariesPath: '/PrBank/assets/h5p-libraries'
+                };
+                h5pInstance = new H5PStandalone.H5P(h5pContainer, options);
+            }
+        };
+    }
+
+    if (btnCloseVideo) {
+        btnCloseVideo.onclick = function() {
+            videoLayer.style.display = "none";
+            h5pContainer.innerHTML = ""; 
+            h5pInstance = null;
+        };
+    }
 
     typeSelect.addEventListener("change", function() {
-        if (typeSelect.value === "1000") { // CRÉDITO
+        if (typeSelect.value === "1000") {
             creditContainer.style.display = "block";
             creditInput.required = true;
-            creditInput.setAttribute("min", "50");
         } else {
-            creditContainer.style.display = "none"; //STANDARD
+            creditContainer.style.display = "none";
             creditInput.required = false;
             creditInput.value = "";
         }
     });
-// ABRIR CAPA DE CUENTA NUEVA:
 
     document.getElementById("btnNuevaCuenta").onclick = function() {
+        editMode = false;
+        currentAccountData = null;
+        formAccount.reset();
+        document.getElementById("newaccountTitle").textContent = "Create new account";
+        typeSelect.disabled = false;
+        balanceInput.disabled = false;
+        creditContainer.style.display = "none";
         formLayer.style.display = "flex";
     };
-
-// CERRAR CAPA Y RESETEAR CAMPOS:
 
     document.getElementById("btnClose").onclick = function() {
         formLayer.style.display = "none";
         formAccount.reset();
-        creditContainer.style.display = "none";
     };
-
-// ==============CONTROLES VIDEO DE AYUDA (H5P)=================================
-
-    const videoLayer = document.getElementById("videoLayer");
-    const btnCloseVideo = document.getElementById("btnCloseVideo");
-    const h5pContainer = document.getElementById("h5p-container");
-    let h5pInstance = null;
-
-    document.querySelector(".help-link").onclick = function(e) {
-        e.preventDefault();
-        videoLayer.style.display = "flex";
-
-        if (!h5pInstance) {
-            const options = { // INDICAMOS LAS RUTAS PARA QUE LA APLICACION TENGA ACCESO A ASSETS DE H5P
-                h5pJsonPath: '/PrBank/assets/h5p-content',
-                h5pJsonPath: '/PrBank/assets/h5p-content',
-                frameJs: '/PrBank/assets/h5p-player/frame.bundle.js',
-                frameCss: '/Prbank/assets/h5p-player/styles/h5p.css',
-                librariesPath: '/PrBank/assets/h5p-libraries'
-            };
-            h5pInstance = new H5PStandalone.H5P(h5pContainer, options);
-        }
-    };
-
-    btnCloseVideo.onclick = function() {
-        videoLayer.style.display = "none";
-        h5pContainer.innerHTML = ""; // LIMPIA EL CONTENEDOR AL CERRAR
-        h5pInstance = null;
-    };
-
-// ENVIO DEL FORMULARIO (POST):
 
     formAccount.onsubmit = async function(event) {
         event.preventDefault();
-        const balance = parseFloat(document.getElementById("balance").value);
-        let creditLineValue = 0;
 
-// VALIDACIÓN DE LA CUENTA DE CRÉDITO:
+        const desc = document.getElementById("description").value;
+        
+        // Regex flexible: acepta 1000 | 1000,50 | 1.000,50
+        const moneyRegex = /^\d{1,3}(\.?\d{3})*([.,]\d{1,2})?$/;
 
-        if (typeSelect.value === "1000") {
-            creditLineValue = parseFloat(creditInput.value);
-            if (isNaN(creditLineValue) || creditLineValue <= 0) {
-                alert("The credit line must be greater than 0.");
-                return;
-            }
-        }
-
-// OBTENCIÓN DEL ID Y LIMPIEZA DEL ID DEL CLIENTE DESDE LA SESIÓN:
-
-        const custIdRaw = sessionStorage.getItem("customer.id");
-        if (!custIdRaw) {
-            alert("Session expired. Please log in again.");
-            window.location.href = "index.html";
+        if (!moneyRegex.test(balanceInput.value)) {
+            alert("Error: The balance format is incorrect (Ej: 1.000,50)");
             return;
         }
-// ELIMINACIÓN DE CARACTERES PROBLEMÁTICOS COMO PUNTOS Y COMAS:
+        
+        if (typeSelect.value === "1000" && !moneyRegex.test(creditInput.value)) {
+            alert("Error: The credit line format is incorrect");
+            return;
+        }
 
-        const idLimpio = parseInt(custIdRaw.replace(/[,.]/g, ""));
+        // Limpieza para el envío al servidor (JSON requiere punto decimal y nada de puntos de millar)
+        const cleanBalance = balanceInput.value.replace(/\./g, "").replace(',', '.');
+        const cleanCredit = creditInput.value.replace(/\./g, "").replace(',', '.');
 
-// CREACIÓN DEL OBJETO CUENTA PARA EL SERVIDOR:
+        const bal = parseFloat(cleanBalance) || 0;
+        let cLine = parseFloat(cleanCredit) || 0;
+        
+        const rawCustId = sessionStorage.getItem("customer.id") || "0";
+        const cleanCustId = rawCustId.toString().replace(/[^0-9]/g, "");
 
-        const nuevaCuenta = {
-            id: Math.floor(Math.random() * 100000000), // ID ALEATORIO TEMPORAL
-            description: document.getElementById("description").value,
-            balance: balance,
-            creditLine: creditLineValue,
-            beginBalance: balance,
-            beginBalanceTimestamp: new Date().toISOString().split('.')[0] + "Z", // FORMATO DE FECHA ISO SEGÚN LAS REGLAS DEL BACKEND
-            "customers": [{ "id": idLimpio }]
-        };
+        let accountObj;
+
+        if (editMode && currentAccountData) {
+            let tipoActual = (currentAccountData.type == 1 || currentAccountData.type === "CREDIT") ? 1 : 0;
+            accountObj = new Account(
+                currentAccountData.id,
+                desc,
+                currentAccountData.balance,
+                (tipoActual === 1) ? cLine : 0,
+                currentAccountData.beginBalance,
+                currentAccountData.beginBalanceTimestamp,
+                tipoActual,
+                cleanCustId
+            );
+        } else {
+            let tValue = (typeSelect.value === "1000") ? 1 : 0;
+            accountObj = new Account(
+                Math.floor(Math.random() * 899999) + 100000,
+                desc,
+                bal,
+                (tValue === 1) ? cLine : 0,
+                bal,
+                new Date().toISOString().split('.')[0] + "Z",
+                tValue,
+                cleanCustId
+            );
+        }
+
+        let payload = accountObj.toJSON();
+        payload.type = (accountObj.type == 1) ? "CREDIT" : "STANDARD";
+        
+        payload.customers = [{
+            id: cleanCustId,
+            firstName: sessionStorage.getItem("customer.firstName"),
+            lastName: sessionStorage.getItem("customer.lastName"),
+            middleInitial: sessionStorage.getItem("customer.middleInitial") || "",
+            street: sessionStorage.getItem("customer.street") || "",
+            city: sessionStorage.getItem("customer.city") || "",
+            state: sessionStorage.getItem("customer.state") || "",
+            zip: sessionStorage.getItem("customer.zip") || "",
+            phone: sessionStorage.getItem("customer.phone") || "",
+            email: sessionStorage.getItem("customer.email") || "",
+            password: sessionStorage.getItem("customer.password") || ""
+        }];
 
         try {
             const response = await fetch(ACCOUNT_URL, {
-                method: "POST",
-                headers: { 
-                    "Content-Type": "application/json", 
-                    "Accept": "application/json" 
-                },
-                body: JSON.stringify(nuevaCuenta) // CONVERTIMOS A CADENA JSON
+                method: editMode ? "PUT" : "POST",
+                headers: { "Content-Type": "application/json", "Accept": "application/json" },
+                body: JSON.stringify(payload)
             });
 
             if (response.ok) {
                 formLayer.style.display = "none";
-                formAccount.reset();
-                creditContainer.style.display = "none";
-                pageLoadHandler(); // LLAMAMOS ALA FUNCION DE REFRESCO.
+                pageLoadHandler();
             } else {
-                alert("Error creating account.");
+                alert("Error saving account.");
             }
         } catch (error) {
-            console.error("Error en POST:", error);
+            console.error("Fetch Error:", error);
         }
     };
 });
 
-
-// ============FUNCIONES ASÍNCRONAS:=======================================================
-
-
-// FUNCION ASÍNCRONA QUE OBTIENE TODOS LOS DATOS DE CUESNTAS DEL USUARIO ACTUAL (GET):
+// ==================== LÓGICA DE TABLA ========================
 
 async function fetchAccounts() {
-    const customerId = sessionStorage.getItem("customer.id").replace(/[,.]/g, "");
-    const response = await fetch(`${SERVICE_URL}${customerId}?t=${new Date().getTime()}`, {
-        method: "GET",
-        headers: { "Accept": "application/json" } // UTILIZAMOS JSON
+    const rawId = sessionStorage.getItem("customer.id") || "0";
+    const customerId = rawId.toString().replace(/[^0-9]/g, "");
+    const response = await fetch(SERVICE_URL + customerId + "?t=" + new Date().getTime(), {
+        headers: { "Accept": "application/json" }
     });
-    return await response.json();
+    const data = await response.json();
+    if (data && data.account) return Array.isArray(data.account) ? data.account : [data.account];
+    return Array.isArray(data) ? data : [];
 }
 
-//FUNCIÓN GENERADORA DE LA FILAS Y CELDAS DE LA TABLA SEGUN LOS DATOS DEL SERVIDOR:
-
+//MODIFICADO: TO DO TABLA EN MODO CARD (AÑADIDOS DATA-LABEL)
 function* userRowGenerator(accounts) {
-    for (let i = 0; i < accounts.length; i++) {
-        const account = accounts[i];
+    for (let acc of accounts) {
         const tr = document.createElement("tr");
-        const fields = ["id", "description", "type", "creditLine", "beginBalanceTimestamp", "beginBalance", "balance"];
+        const esCredito = (acc.type === "CREDIT" || acc.type == 1);
         
-        for (let j = 0; j < fields.length; j++) {
-            const field = fields[j];
-            const td = document.createElement("td");
-            let value = account[field];
+        // IMPORTANTE: data-label con los nombres originales que querías
+        tr.innerHTML = `<td data-label="ID">${acc.id}</td>` +
+                       `<td data-label="Description">${acc.description || ""}</td>` +
+                       `<td data-label="Type">${esCredito ? "CREDIT" : "STANDARD"}</td>` +
+                       `<td data-label="Credit Line">${fmt(acc.creditLine)}</td>` +
+                       `<td data-label="Timestamp">${acc.beginBalanceTimestamp ? new Date(acc.beginBalanceTimestamp).toLocaleDateString() : "---"}</td>` +
+                       `<td data-label="Begin Balance">${fmt(acc.beginBalance)}</td>` +
+                       `<td data-label="Balance"><span style="${acc.balance < 0 ? 'color:red;font-weight:bold;' : ''}">${fmt(acc.balance)}</span></td>` +
+                       `<td class="acciones-celda"></td>`;
 
-// VALIDACIÓN POR TIPO DE CUENTA:
+        const tdAction = tr.querySelector(".acciones-celda");
 
-            if (field === "type") {
-                td.textContent = account.creditLine > 0 ? "CREDIT" : "STANDARD";
-            } 
-            else if (field === "beginBalanceTimestamp" && value) {
-                const date = new Date(value);
-                td.textContent = new Intl.DateTimeFormat("es-ES", { 
-                    day: "2-digit", month: "2-digit", year: "numeric",
-                    hour: "2-digit", minute: "2-digit", hour12: false
-                }).format(date);
-            }
-            else if (["creditLine", "beginBalance", "balance"].includes(field)) {
-                const number = parseFloat(value || 0);
-                td.textContent = new Intl.NumberFormat("es-ES", { 
-                    style: "currency", currency: "EUR" 
-                }).format(number);
-            }
-            else {
-                td.textContent = value !== undefined ? value : "";
-            }
-            tr.appendChild(td);
-        }
-
-// COLUMNA DE ACCIONES (BOTÓN DE MOVIMIENTOS Y BORRAR):
-
-        const tdAction = document.createElement("td");
-
-// BOTÓN MOVEMENTS: GUARDA ID, BALANCE, CREDIT LINE Y REDIRIGE:
-        
-        const btnVer = document.createElement("button");
-        btnVer.classList.add('movbutton');
-        btnVer.textContent = "Movements";
-        btnVer.onclick = function() {
-            sessionStorage.setItem("account.id", account.id);
-            sessionStorage.setItem("account.balance", account.balance);
-            sessionStorage.setItem("account.creditLine", account.creditLine);
+        const btnMov = document.createElement("button");
+        btnMov.className = 'movbutton';
+        btnMov.textContent = "Movements";
+        btnMov.onclick = function() {
+            sessionStorage.setItem("account.id", acc.id);
+            sessionStorage.setItem("account.balance", acc.balance);
+            sessionStorage.setItem("account.creditLine", acc.creditLine || 0);
             window.location.href = "mymovements.html";
         };
-        
-// BOTÓN BORRAR: LLAMA A LA FUNCIÓN DE ELIMINACIÓN:
 
-        const btnBorrar = document.createElement("button");
-        btnBorrar.classList.add('borbutton');
-        btnBorrar.textContent = "Delete";
-        btnBorrar.onclick = function() {
-            deleteAccount(account.id);
+        const btnEdit = document.createElement("button");
+        btnEdit.className = 'movbutton';
+        btnEdit.textContent = "Edit";
+        btnEdit.onclick = function() {
+            editMode = true;
+            currentAccountData = acc;
+            document.getElementById("newaccountTitle").textContent = "Edit Account " + acc.id;
+            document.getElementById("description").value = acc.description;
+            // Para editar mostramos el número formateado pero sin el símbolo de euro
+            document.getElementById("balance").value = fmt(acc.balance).replace(/[€\s]/g, "");
+            document.getElementById("balance").disabled = true;
+            document.getElementById("type").value = esCredito ? "1000" : "0";
+            document.getElementById("type").disabled = true;
+            
+            if (esCredito) {
+                document.getElementById("creditLineContainer").style.display = "block";
+                document.getElementById("creditLineInput").value = fmt(acc.creditLine).replace(/[€\s]/g, "");
+            } else {
+                document.getElementById("creditLineContainer").style.display = "none";
+            }
+            document.getElementById("formLayer").style.display = "flex";
         };
-        
-        tdAction.appendChild(btnVer);
-        tdAction.appendChild(btnBorrar);
-        tr.appendChild(tdAction);
-        yield tr; // RETORNA LA FILA Y PAUSA EJECUCIÓN
+
+        const btnDel = document.createElement("button");
+        btnDel.className = 'borbutton';
+        btnDel.textContent = "Delete";
+        btnDel.onclick = function() { deleteAccount(acc.id); };
+
+        tdAction.appendChild(btnMov);
+        tdAction.appendChild(btnEdit);
+        tdAction.appendChild(btnDel);
+        yield tr;
     }
 }
-
-
-// FUNCIÓN ASÍNCRONA DE CARGA DE LA PÁGINA:
 
 async function pageLoadHandler() {
     try {
         const accounts = await fetchAccounts();
-        totalBalanceAccounts(accounts); // ACTUALIZA EL SUMATORIO TOTAL
-        const tbody = document.querySelector("#tableBody");
-        tbody.innerHTML = ""; // LIMPIEZA DE DATOS PREVIOS DE LA TABLA
-        const rowGenerator = userRowGenerator(accounts);
-        for (const row of rowGenerator) {
-            tbody.appendChild(row);
+        totalBalanceAccounts(accounts);
+        const tbody = document.getElementById("tableBody");
+        if (!tbody) return;
+        tbody.innerHTML = "";
+        const rowGen = userRowGenerator(accounts);
+        
+        let res = rowGen.next();
+        while (!res.done) {
+            tbody.appendChild(res.value);
+            res = rowGen.next();
         }
-    } catch (e) {
-        console.error("Loading error:", e);
-    }
+    } catch (e) { console.error(e); }
 }
-
-// FUNCIÓN ASÍNCRONA DE BORRADO DE CUENTAS:
 
 async function deleteAccount(id) {
-    if (confirm("Are you sure you want to delete account " + id + "?")) {
-        try {
-            const res = await fetch(ACCOUNT_URL + id, { method: "DELETE" });
-            if (res.ok) {
-                pageLoadHandler();
-            } else {
-                // MENSAJE DE CONFIRMACIÓN EN CASO DE ERROR (POR MOVIMIENTOS ASOCIADOS)
-                alert("This account cannot be deleted because it has associated movements. Please delete the movements first.");
-            }
-        } catch (error) {
-            console.error("Delete error:", error);
-            alert("A network error occurred while trying to delete the account.");
-        }
+    if (confirm("Delete account " + id + "?")) {
+        const res = await fetch(ACCOUNT_URL + id, { method: "DELETE" });
+        if (res.ok) pageLoadHandler();
+        else alert("Accounts with associated movements cannot be deleted.");
     }
 }
 
-//===================OTRAS  FUNCIONES=======================================
-
-// FUNCIÓN DE CALCULO DE BALANCE DE TODAS LAS CUENTAS DEL USUARIO:
+// ==================== UTILIDADES ========================
 
 function totalBalanceAccounts(accounts) {
-    let totalBalance = 0;
-    for (let i = 0; i < accounts.length; i++) {
-        totalBalance += (parseFloat(accounts[i].balance) || 0);
-    }
-
-// FORMATEO DE DIVISA E IMPORTES DEL BALANCE:
-
-    const formateador = new Intl.NumberFormat("es-ES", {
-        style: "currency",
-        currency: "EUR"
-    }).format(totalBalance);
+    const total = accounts.reduce(function(acumulador, cuentaActual) {
+        return acumulador + (parseFloat(cuentaActual.balance) || 0);
+    }, 0);
     
-    const txtTop = document.getElementById("totalBalanceTop");
-    const txtBottom = document.getElementById("totalBalanceBottom");
-    
-    if (txtTop) txtTop.textContent = formateador;
-    if (txtBottom) txtBottom.textContent = formateador;
+    const f = fmt(total);
+    if (document.getElementById("totalBalanceTop")) document.getElementById("totalBalanceTop").textContent = f;
+    if (document.getElementById("totalBalanceBottom")) document.getElementById("totalBalanceBottom").textContent = f;
 }
 
-// FUNCIÓN DE OBTENCIÓN DEL NOMBRE Y APELLIDO DE USUARIO (BIENVENIDA):
-
 function displayUserData() {
-    const firstName = sessionStorage.getItem("customer.firstName");
-    const lastName = sessionStorage.getItem("customer.lastName");
-    const displayElement = document.getElementById("userNameDisplay");
+    const fn = sessionStorage.getItem("customer.firstName");
+    const ln = sessionStorage.getItem("customer.lastName");
+    const d = document.getElementById("userNameDisplay");
+    if (d && fn) d.textContent = fn + " " + ln;
+}
 
-    if (displayElement && firstName && lastName) {
-        displayElement.textContent = firstName + " " + lastName;
-    }
+/**
+ * FUNCIÓN DE FORMATEO: 
+ * Restaura el símbolo de moneda y asegura separadores de miles
+ */
+function fmt(v) { 
+    return new Intl.NumberFormat("es-ES", { 
+        style: "currency", 
+        currency: "EUR",
+        useGrouping: true, 
+        minimumFractionDigits: 2 
+    }).format(v || 0); 
 }
 
   /**
