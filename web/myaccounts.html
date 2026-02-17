@@ -9,7 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="assets/theme/images/icon.png" type="image/x-icon">
     <title>Cuentas - PrBank</title>
-    <link rel="stylesheet" href="assets/theme/css/styles.css">
+    <link rel="stylesheet" href="assets/theme/css/styles.css" title="Modo Claro">
     <script src="assets/h5p-player/main.bundle.js"></script>
     <script src="assets/theme/js/myaccounts.js"></script>
     <script src="assets/theme/js/model.js"></script>
@@ -18,38 +18,40 @@
 
     <header class="header-bar">
         <nav role="navigation" aria-label="main navigation">
-        <div class="header-content">
-            <h1>PrBank</h1>
-            <button class="header-link" onclick="goHome()">Return to Index</button>
-            <div class="header-actions">
-                <button class="logout-link" onclick="logout()">Sign Out</button>
+            <div class="header-content">
+                <h1>PrBank</h1>
+                <button class="header-link" onclick="goHome()">Return to Index</button>
+                <div class="header-actions">
+                    <button class="logout-link" onclick="logout()">Sign Out</button>
+                </div>
             </div>
-        </div>
+        </nav>
     </header>
     
-    <div style="text-align: right; margin-top: 30px; margin-right: 20px;">
+    <div class="help-button-wrapper">
         <button class="help-link">Need Help?</button>
     </div>
 
     <section class="bienvenida">
-    <h2>Welcome, <span id="userNameDisplay">User</span>!</h2> <p>Manage your accounts securely.</p>
-</section>
+        <h2>Welcome, <span id="userNameDisplay">User</span>!</h2> 
+        <p>Manage your accounts securely.</p>
+    </section>
         
     <main>
-        <div class="total-balance" style="padding: 20px; text-align: right; font-size: 1.2em;">
+        <div class="total-balance">
             <strong>Global balance: </strong> <span id="totalBalanceTop">0,00 €</span>
         </div>
                 
         <div class="contenedor-central">
-            <div class="recuadro-principal" style="width: 95%; flex-direction: column;">
+            <div class="recuadro-principal table-main-container">
                 
-                <div style="text-align: left; width: 100%; margin-bottom: 15px;">
+                <div class="action-bar-left">
                     <button id="btnNuevaCuenta" class="iniciar">
                         + New account
                     </button>
                 </div>
 
-                <table class="tabla-bancaria" role ="table" aria-label="Accounts Table">
+                <table class="tabla-bancaria" role="table" aria-label="Accounts Table">
                     <thead>
                         <tr>
                             <th scope="col">ID</th>
@@ -65,25 +67,25 @@
                     <tbody id="tableBody"></tbody>
                 </table>
 
-                <div class="total-balance" style="padding: 20px; text-align: right; font-size: 1.2em;">
+                <div class="total-balance">
                     <strong>Global balance: </strong> <span id="totalBalanceBottom">0,00 €</span>
                 </div>
             </div>
         </div>
 
-        <div id="formLayer" class="capa-overlay" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="newaccountTitle">
-            <div class="recuadro-principal" style="max-width: 420px;">
+        <div id="formLayer" class="capa-overlay hidden-init" role="dialog" aria-modal="true">
+            <div class="recuadro-principal modal-small">
                 <h3 id="newaccountTitle">Create new account</h3>
                 <form id="formAccount">
-                    <input type="text" id="description" placeholder="Account description" required style="width:100%; margin-bottom:12px; padding:10px;">
-                    <input type="number" id="balance" placeholder="Initial balance" required style="width:100%; margin-bottom:12px; padding:10px;">
-                    <select id="type" style="width:100%; margin-bottom:20px; padding:10px;">
+                    <input type="text" id="description" placeholder="Account description" required class="input-form-full">
+                    <input type="text" id="balance" placeholder="Initial balance (ej: 1.250,50)" required class="input-form-full">
+                    <select id="type" class="input-form-full" style="margin-bottom:20px;">
                         <option value="0">STANDARD</option>
                         <option value="1000">CREDIT</option>
                     </select>
-                   <div id="creditLineContainer" style="display: none;">
+                    <div id="creditLineContainer" class="hidden-init">
                          <label>Credit Line Amount:</label>
-                         <input type="number" id="creditLineInput" step="0.01" min="0.01" placeholder="Must be greater than 0" style="width:100%; margin-bottom:12px; padding:10px;">
+                         <input type="text" id="creditLineInput" placeholder="Credit Line (ej: 500,00)" class="input-form-full">
                     </div>
                     <div class="botones">
                         <button type="submit" class="iniciar">Save</button>
@@ -93,28 +95,25 @@
             </div>
         </div>
 
-        <div id="videoLayer" class="capa-overlay" style="display:none;" role="dialog" aria-modal="true">
-            <div class="recuadro-principal" style="max-width: 900px; width: 95%;">
+        <div id="videoLayer" class="capa-overlay hidden-init" role="dialog" aria-modal="true">
+            <div class="recuadro-principal modal-video">
                 <h3>Help & Tutorial</h3>
-                <div id="h5p-container" style="width: 100%; min-height: 500px; background: #f9f9f9;"></div>
-                <div class="botones" style="margin-top: 15px;">
+                <div id="h5p-container" class="h5p-player-area"></div>
+                <div class="botones spacing-top">
                     <button type="button" id="btnCloseVideo" class="cancelar">Close Help</button>
                 </div>
             </div>
         </div>
-
     </main>
 
     <script>
-        //TODO Mover este código a un script, por ejemplo a myaccounts.js
         function goHome() { window.location.href = "mymain.html"; }
         function logout() { sessionStorage.clear(); window.location.href = "index.html"; }
     </script>
     
     <footer>
         <p>© 2026 PrBank. All Rights Reserved.</p>
-        <p>Alejandro Martín, Kenneth León, David Aranda.</p>
+        <p>Alejandro Martín, Kenneth León, David Aranda (Narayan).</p>
     </footer>
-    
 </body>
 </html>
