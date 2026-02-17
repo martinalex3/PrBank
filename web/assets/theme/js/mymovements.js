@@ -18,11 +18,7 @@ let movements = [];
 document.addEventListener("DOMContentLoaded", function(){
     buildMovementsTable();
     updateAccountInfo();
-    syncAccountBalance();
     //TODO No tiene sentido pasar el saldo de la cuenta al saldo inicial y guardarlo en la sesión en la carga de la página de movimientos.
-    // GUARDAR EL BALANCE INICIAL DE LA CUENTA
-    const initialBalance = parseFloat(sessionStorage.getItem("account.balance")) || 0;
-    sessionStorage.setItem("account.initialBalance", initialBalance);
     // ACTUALIZA EL ID Y EL BALANCE AL CARGAR LA PAGINA
     updateAccountInfo();
     // MUESTRA EL ID DE LA CUENTA
@@ -75,6 +71,10 @@ document.addEventListener("DOMContentLoaded", function(){
     document.getElementById("btnConfirmNo").addEventListener("click", function() {
     document.getElementById("confirmLayer").style.display = "none"; // Cerramos sin borrar
     });
+    // NAVEGACIÓN A CUENTAS
+    document.getElementById("btnGoToAccounts").addEventListener("click", goToAccounts);
+    // CERRAR SESIÓN
+    document.getElementById("btnLogout").addEventListener("click", logout);
 });
 // ========================= FETCH MOVIMIENTOS =======================
 // LEER TABLAS EN EL SERVIDOR (cRud)
@@ -136,6 +136,7 @@ async function buildMovementsTable() {
         tbody.appendChild(row);
     }
     // ACTUALIZA LOS DASTOS DE LA CUENTA EN PANTALLA AL MAS RECIENTE
+    updateTotals(movements);
     updateAccountInfo();
 }
 // =================== CREACION DE MOVIMIENTOS ====================
@@ -178,13 +179,13 @@ async function createMovement(evt) {
             }
         }
         //FIXME Instanciar un objeto Movement y utilizar su constructor para inicializarlo.
-        const newMovement = {
-            id: null,
-            amount: amountValue,
-            description: description,
-            timestamp: new Date().toISOString(),
-            balance: newBalance
-        };
+        const newMovement = new Movement(
+            null,
+            amountValue,
+            description,
+            new Date().toISOString(),
+            newBalance
+        );
 
         const response = await fetch(
             SERVICE_DEL_URL + sessionStorage.getItem("account.id"),
@@ -203,7 +204,7 @@ async function createMovement(evt) {
         }
 
         account.balance = newBalance;
-        await syncAccountBalance(account);
+        await syncAccountBalance(sessionStorage.getItem("account.id"), newBalance);
 
         await buildMovementsTable();
         updateAccountInfo();
@@ -359,12 +360,34 @@ async function fetchAccountById(accountId) {
     });
 
     if (!response.ok) {
-        throw new Error("Error fetching account");
+        // Cambia esta línea para ver el status real
+        throw new Error(`Error fetching account: ${response.status} ${response.statusText} — URL: ${ACCOUNT_URL + accountId}`);
     }
 
     return await response.json();
 }
+// ======================== TODO TOTALS ======================================
+// ====================== TOTALES INGRESOS Y GASTOS ======================
+function updateTotals(movements) {
+    let totalIncome = 0;
+    let totalExpenses = 0;
 
+    movements.forEach(movement => {
+        if (movement.description === "Deposit") {
+            totalIncome += parseFloat(movement.amount);
+        } else {
+            totalExpenses += parseFloat(movement.amount);
+        }
+    });
+
+    const formatter = new Intl.NumberFormat("es-ES", {
+        style: "currency",
+        currency: "EUR"
+    });
+
+    document.getElementById("totalIncome").textContent = formatter.format(totalIncome);
+    document.getElementById("totalExpenses").textContent = formatter.format(totalExpenses);
+}
 // ======================== SCRIPTS DE NAVEGACION ============================
 function goToAccounts() {
         window.location.href = "myaccounts.html";
@@ -372,3 +395,13 @@ function goToAccounts() {
 function logout() {
         window.location.href = "index.html";
     }
+
+
+/*Examen
+ * FIXME MOVEMENTS (OK)
+ * TODO BOTONES (OK)
+ * TODO TOTALPAYMENTS/DEPOSITS(OK)
+ * SENDOS ELEMENTOS (OK)
+ * TODO ELIMINAR LINEA ABSURDA (OK)
+ * TODO REGEXP (NO)
+ */

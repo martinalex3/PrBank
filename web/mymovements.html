@@ -22,9 +22,9 @@
             <h1>PrBank</h1>
             <!-- TEXTO IR A CUENTAS -->
             <!-- TODO eliminar el atributo onclick de los siguientes dos buttons y asociarles manejador en el script JS  -->
-            <button class="header-link" onclick="goToAccounts()">Go to Accounts</button>
+            <button class="header-link" id="btnGoToAccounts">Go to Accounts</button>
             <!-- CERRAR SESIÓN -->
-            <button class="logout-link" onclick="logout()">Sign Out</button>
+            <button class="logout-link" id="btnLogout">Sign Out</button>
         </div>
     </nav>
 </header>
@@ -51,6 +51,15 @@
             </div>
             <div class="account-creditLine">
                 Credit Line: <span id="accountCreditText"></span>
+            </div>
+        </div>
+        <!-- TODO TOTALES INGRESOS Y GASTOS -->
+        <div class="account-info">
+            <div class="total-income">
+                Total Deposits: <span id="totalIncome">0,00 €</span>
+            </div>
+            <div class="total-expenses">
+                Total Payments: <span id="totalExpenses">0,00 €</span>
             </div>
         </div>
         <div class="contenedor-central">
