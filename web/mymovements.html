@@ -1,21 +1,28 @@
 <!DOCTYPE html>
+
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="assets/images/icon.png" type="image/x-icon">
     <title>Movements - PrBank</title>
-    <!-- CSS unificado -->
+
+    <!-- CSS PRINCIPAL -->
     <link rel="stylesheet" href="assets/theme/css/styles.css">
+
+    <!-- CSS ALTERNATIVO -->
+    <!-- TODO RESUELTO -->
+    <link rel="alternate stylesheet" href="assets/theme/css/styles2.css" title="Modo Oscuro">
+
     <!-- H5P -->
     <script src="assets/h5p-player/main.bundle.js"></script>
-    <!-- JS -->
+
+    <!-- SCRIPTS -->
     <script src="assets/theme/js/mymovements.js"></script>
     <script src="assets/theme/js/model.js"></script>
 </head>
+
 <body>
-<!--TODO: Introducir sendos elementos para mostrar el valor agregado del total de los ingresos y de los gastos. -->
-    <!-- HEADER CON NAV -->
 <header class="header-bar">
     <nav role="navigation" aria-label="Main navigation">
         <div class="header-content">
@@ -28,30 +35,61 @@
         </div>
     </nav>
 </header>
-    
-    <!-- BOTÓN HELP -->
-    <div style="text-align: right; margin-top: 30px; margin-right: 20px;">
-        <button class="help-link" onclick="needHelp()">Need Help?</button>
+
+<div class="help-button-wrapper">
+    <button class="help-link" onclick="needHelp()">Need Help?</button>
+</div>
+
+<section class="bienvenida">
+    <h2>Welcome to your Movements</h2>
+    <p>Make transactions in a safe way.</p>
+</section>
+
+<main>
+
+    <div class="account-info">
+        <div class="account-id">
+            Account ID: <span id="accountIdText"></span>
+        </div>
+        <div class="account-balance">
+            Current Balance: <span id="accountBalanceText"></span>
+        </div>
+        <div class="account-creditLine">
+            Credit Line: <span id="accountCreditText"></span>
+        </div>
     </div>
 
-    <!-- BIENVENIDA -->
-    <section class="bienvenida">
-        <h2>Welcome to your Movements</h2>
-        <p>Make transactions in a safe way.</p>
-    </section>
+    <div class="contenedor-central">
+        <div class="recuadro-principal table-main-container">
 
-    <main>
-        <!-- INFO DE CUENTA -->
-        <div class="account-info">
-            <div class="account-id">
-                Account ID: <span id="accountIdText"></span>
+            <div class="action-bar-left">
+                <button id="btnOpen" class="btn-new-movement header-btn">
+                    New Movement...
+                </button>
             </div>
-            <div class="account-balance">
-               Current Balance: <span id="accountBalanceText"></span>
+            <!-- TABLA -->
+            <table class="tabla-bancaria" role="table" aria-label="Movements Table">
+                <thead>
+                    <tr>
+                        <th scope="col">TimeStamp</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Amount</th>
+                        <th scope="col">Balance</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+
+            <div class="balance-highlight">
+                Your Current Balance is: <span id="accountBalanceBottom"></span>
             </div>
-            <div class="account-creditLine">
-                Credit Line: <span id="accountCreditText"></span>
+
+            <div class="action-bar-center">
+                <button id="btnUndo" class="btn-undo header-btn">
+                    Undo Last Movement...
+                </button>
             </div>
+
         </div>
         <!-- TODO TOTALES INGRESOS Y GASTOS -->
         <div class="account-info">
@@ -62,105 +100,79 @@
                 Total Payments: <span id="totalExpenses">0,00 €</span>
             </div>
         </div>
-        <div class="contenedor-central">
-            <div class="recuadro-principal" style="width: 95%; flex-direction: column;">
-                <!-- BOTÓN CREAR A LA IZQUIERDA -->
-                <div style="text-align: left; width: 100%; margin-bottom: 15px;">
-                    <button id="btnOpen" class="btn-new-movement header-btn">
-                        New Movement...
-                    </button>
-                </div>
+    </div>
+    <!-- FORMULARIO NUEVO MOVIMIENTO -->
+    <div id="formLayer" class="capa-overlay hidden-init" role="dialog" aria-modal="true" aria-labelledby="newMovementTitle">
 
-                <!-- TABLA -->
-                <table class="tabla-bancaria" role="table" aria-label="Movements Table">
-                    <thead>
-                        <tr>
-                            <th scope="col">TimeStamp</th>
-                            <th scope="col">Description</th>
-                            <th scope="col">Amount</th>
-                            <th scope="col">Balance</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody"></tbody>
-                </table>
+        <div class="recuadro-principal modal-small">
+            <h3 id="newMovementTitle">Make a new transaction</h3>
 
-                <!-- TEXTO BALANCE DESTACADO -->
-                <div class="balance-highlight">
-                    Your Current Balance is: <span id="accountBalanceBottom"></span>
-                </div>
+            <form id="formAccount">
 
-                <!-- BOTÓN DESHACER CENTRADO -->
-                <div style="text-align: center; margin-top: 20px;">
-                    <button id="btnUndo" class="btn-undo header-btn">
-                        Undo Last Movement...
-                    </button>
-                </div>
-            </div>
-        </div>
+                <!-- LABEL TODO -->
+                <label for="tfAmount">Amount</label>
+                <input type="text"
+                       id="tfAmount"
+                       name="amount"
+                       required
+                       class="input-form-full">
 
-        <!-- FORMULARIO NUEVO MOVIMIENTO -->
-        <div id="formLayer" class="capa-overlay" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="newMovementTitle">
-            <div class="recuadro-principal" style="max-width: 420px;">
-                <h3 id="newMovementTitle">Make a new transaction</h3>
-                <form id="formAccount">
-                    <!-- CANTIDAD -->
-                    <input type="number"
-                           id="tfAmount"
-                           placeholder="Cantidad"
-                           step="0.01"
-                           required
-                           style="width:100%; margin-bottom:12px; padding:10px;">
+                <fieldset class="movement-type-flex">
+                    <legend>Choose movement type</legend>
 
-                    <!-- TIPO -->
-                    <h3>Type of Movement</h3>
-                    <fieldset style="display:flex; justify-content: space-around; margin-bottom:20px;">
-                        <label>
-                            <input type="radio" id="rbDeposit" name="movementType" value="IN" checked>
-                            Deposit
-                        </label>
-                        <label>
-                            <input type="radio" id="rbPayment" name="movementType" value="OUT">
-                            Payment
-                        </label>
-                    </fieldset>
+                    <input type="radio"
+                           id="rbDeposit"
+                           name="movementType"
+                           value="IN"
+                           checked>
+                    <label for="rbDeposit">Deposit</label>
 
-                    <div class="botones">
-                        <button type="submit" class="iniciar">Save</button>
-                        <button type="button" id="btnClose" class="cancelar">Cancel</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- CONFIRMACIÓN BORRADO MOVIMIENTO -->
-        <div id="confirmLayer" class="capa-overlay" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="confirmDeleteTitle">
-            <div class="recuadro-principal" style="max-width: 420px; text-align:center;">
-                <h3 id="confirmDeleteTitle">Confirm Delete</h3>
-                <p>Are you sure you want to delete the last movement?
-                This action cannot be reversed.</p>
+                    <input type="radio"
+                           id="rbPayment"
+                           name="movementType"
+                           value="OUT">
+                    <label for="rbPayment">Payment</label>
+                </fieldset>
 
                 <div class="botones">
-                    <button id="btnConfirmYes" class="volver">Yes, delete.</button>
-                    <button id="btnConfirmNo" class="cancelar">No, cancel.</button>
+                    <button type="submit" class="iniciar">Save</button>
+                    <button type="button" id="btnClose" class="cancelar">Cancel</button>
                 </div>
+
+            </form>
+        </div>
+    </div>
+
+    <!-- CONFIRMACION BORRADO -->
+    <div id="confirmLayer" class="capa-overlay hidden-init" role="dialog" aria-modal="true" aria-labelledby="confirmDeleteTitle">
+
+        <div class="recuadro-principal modal-small text-center">
+            <h3 id="confirmDeleteTitle">Confirm Delete</h3>
+            <p>Are you sure you want to delete the last movement? This action cannot be reversed.</p>
+            <div class="botones">
+                <button id="btnConfirmYes" class="volver">Yes, delete.</button>
+                <button id="btnConfirmNo" class="cancelar">No, cancel.</button>
             </div>
         </div>
-        
-        <!-- H5P Overlay -->
-        <div id="videoLayer" class="capa-overlay" style="display:none;" role="dialog" aria-modal="true">
-            <div class="recuadro-principal" style="max-width: 900px; width: 95%;">
-                <h3>Help & Tutorial</h3>
-                    <div id="h5p-container" style="width: 100%; min-height: 500px; background: #f9f9f9;"></div>
-                    <div class="botones" style="margin-top: 15px;">
-                    <button type="button" id="btnCloseVideo" class="cancelar">Close Help</button>
-                </div>
+    </div>
+    <!-- H5P Overlay -->
+    <div id="videoLayer"
+         class="capa-overlay hidden-init"
+         role="dialog"
+         aria-modal="true">
+
+        <div class="recuadro-principal modal-video">
+            <h3>Help & Tutorial</h3>
+            <div id="h5p-container" class="h5p-player-area"></div>
+            <div class="botones spacing-top">
+                <button type="button" id="btnCloseVideo" class="cancelar">Close Help</button>
             </div>
         </div>
-    </main>
-    <!-- FOOTER -->
-    <footer>
-        <p>© 2026 PrBank. All Rights Reserved.</p>
-        <p>Alejandro Martín, Kenneth León, David Aranda.</p>
-    </footer>
+    </div>
+</main>
+<footer>
+    <p>©2026 PrBank. All Rights Reserved.</p>
+    <p>Alejandro Martin, Kenneth Leonn, David Aranda.</p>
+</footer>
 </body>
 </html>
