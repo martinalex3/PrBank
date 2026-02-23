@@ -2,11 +2,11 @@
    VARIABLES Globales
    ========================= */
 :root {
-    --blue-dark: #0d47a1;
-    --blue-light: #1976d2;
-    --soft-bg: #f4f7fb;
-    --white: #ffffff;
-    --light-light-blue: #8AACC1
+    --blue-dark: #1a1a1a;
+    --blue-light: #3700b3;
+    --soft-bg: #121212;
+    --white: #1e1e1e;
+    --light-light-blue: #33444c
 }
 /*Son variables que una vez definidas, se pueden usar globalmente en las paginas web*/
 /* =========================
@@ -20,7 +20,7 @@ body {
     padding: 0;
     font-family: Arial, sans-serif;
     background: var(--soft-bg);
-    color: #111;
+    color: #e0e0e0;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
@@ -30,7 +30,7 @@ body {
    ========================= */
 header {
     width: 100%;
-    background-color: var(--blue-dark);
+    background-color: #000000;
     color: white;
     padding: 20px 0;
     text-align: center;
@@ -56,7 +56,7 @@ header {
     left: 25px;
     top: 50%;
     transform: translateY(-50%);
-    color: white;
+    color: #bb86fc; 
     font-weight: bold;
     font-size: 1rem;
     cursor: pointer;
@@ -69,18 +69,21 @@ header {
 }
 /* Botones en header / contenedores fuera de .botones */
 .header-btn {
-    padding: 12px 20px;      /* mismo tamaño que otros botones */
+    padding: 12px 20px;
     font-size: 15px;
     border-radius: 8px;
-    min-height: 44px;        /* fuerza la misma altura */
-    line-height: 1.2;        /* consistente */
+    min-height: 44px;
+    line-height: 1.2;
     cursor: pointer;
+    color: white; /* Texto blanco */
 }
 /* Cerrar sesión a la derecha */
 .logout-link {
     position: absolute;
     right: 25px;
-    color: white;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #bb86fc; 
     font-weight: bold;
     cursor: pointer;
     font-size: 1rem;
@@ -97,21 +100,19 @@ header {
     min-height: 44px;
     line-height: 1.2;
     cursor: pointer;
-    min-width: 180px; /* fuerza ancho uniforme */   
-    
+    min-width: 180px; 
+    color: white; /* Texto blanco */
 }
 /* =========================
    ACCESIBILIDAD (MUY IMPORTANTE))
    ========================= */
-/* ================== ESTILOS ACCESIBLES ================== */
-
 /* DESTACAR ENLACES */
 a.header-link, a.logout-link, a.help-link {
     text-decoration: underline;
-    color: #ffbf47;
+    color: #bb86fc;
 }
 a.header-link:focus, a.logout-link:focus, a.help-link:focus {
-    outline: 3px solid #ffbf47;
+    outline: 3px solid #bb86fc;
     outline-offset: 2px;
 }
 /* BOTONES ACCESIBLES */
@@ -119,9 +120,10 @@ button {
     cursor: pointer;
     padding: 8px 12px;
     font-size: 1rem;
+    color: white; /* Texto blanco por defecto en todos los botones */
 }
 button:focus {
-    outline: 3px solid #ffbf47;
+    outline: 3px solid #bb86fc;
     outline-offset: 2px;
 }
 /* MODALES Y CAPAS OVERLAY */
@@ -131,14 +133,14 @@ button:focus {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(0,0,0,0.7);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
 }
 
-/* SR-ONLY (para etiquetas ocultas visualmente pero accesibles) */
+/* SR-ONLY */
 .sr-only {
     position: absolute;
     width: 1px;
@@ -153,14 +155,14 @@ button:focus {
     background: none;
     border: none;
     padding: 0;
-    color: var(--white);
+    color: #bb86fc;
     cursor: pointer;
     text-decoration: underline;
 }
 
 /* FOCO VISUAL PARA TODOS LOS BOTONES Y ENLACES */
 button:focus, .header-link:focus, .logout-link:focus, .help-link:focus {
-    outline: 3px solid #1976d2;
+    outline: 3px solid #3700b3;
     outline-offset: 2px;
 }
 /* =========================
@@ -172,19 +174,18 @@ button:focus, .header-link:focus, .logout-link:focus, .help-link:focus {
     padding: 0 20px;
 }
 .bienvenida h2 {
-    color: var(--blue-dark);
+    color: #bb86fc;
     margin: 0;
     font-size: 1.8rem;
 }
 .bienvenida p {
     margin-top: 8px;
-    color: #333;
+    color: #bbb;
     font-size: 1.1rem;
 }
 /* =========================
    PAGINAS DE AYUDA (ACCOUNTS Y MOVEMENTS)
    ========================= */
-/* CONTENEDOR CENTRADO */
 .help-container {
     display: flex;
     justify-content: center;
@@ -196,12 +197,12 @@ button:focus, .header-link:focus, .logout-link:focus, .help-link:focus {
    ========================= */
 .account-info {
     display: flex;
-    justify-content: center;   /* centra todo el bloque */
+    justify-content: center;
     align-items: center;
-    gap: 40px;                 /* espacio entre ID y balance */
+    gap: 40px;
     margin-bottom: 20px;
     font-weight: bold;
-    color: var(--blue-dark);
+    color: #bb86fc;
     font-size: 1.05rem;
 }
 .account-id,
@@ -214,24 +215,23 @@ button:focus, .header-link:focus, .logout-link:focus, .help-link:focus {
     text-align: right;
     font-weight: bold;
     font-size: 1.3rem;
-    color: var(--blue-dark);
+    color: #bb86fc;
 }
 /* =========================
    INFO CUSTOMER (ID + BALANCE)
    ========================= */
 .total-balance {
     display: flex;
-    justify-content: center;   /* centra todo el bloque */
-    align-items: right;
-    gap: 40px;                 /* espacio entre ID y balance */
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
     margin-bottom: 20px;
     font-weight: bold;
-    color: var(--blue-dark);
+    color: #bb86fc;
     font-size: 1.05rem;
-}
-.total-balance {
     text-align: right;
 }
+
 /* =========================
    CONTENEDOR CENTRAL
    ========================= */
@@ -244,11 +244,11 @@ button:focus, .header-link:focus, .logout-link:focus, .help-link:focus {
     background: var(--white);
     padding: 30px;
     border-radius: 15px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    
+    border: 1px solid #333;
 }
 /* =========================
    TARJETAS DEL INDEX
@@ -263,38 +263,39 @@ button:focus, .header-link:focus, .logout-link:focus, .help-link:focus {
 .card {
     width: 400px;
     height: 430px;
-    background: var(--white);
+    background: #252525;
     border-radius: 14px;
-    box-shadow: 0 10px 30px rgba(13,71,161,0.08);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: transform 0.22s ease, box-shadow 0.22s ease;
-    border: 1px solid rgba(13,71,161,0.06);
+    border: 1px solid #333;
 }
 .card:hover {
     transform: translateY(-8px) scale(1.02);
-    box-shadow: 0 18px 40px rgba(13,71,161,0.14);
+    box-shadow: 0 18px 40px rgba(0,0,0,0.6);
 }
 .card img {
     max-width: 140px;
     max-height: 120px;
     margin-bottom: 18px;
     object-fit: contain;
+    filter: brightness(0.8);
 }
 .card-title {
     font-weight: bold;
-    color: var(--blue-dark);
+    color: #bb86fc;
     font-size: 1.15rem;
 }
 /* =========================
    ENCABEZADOS DE LA TABLA
 ============================ */
 .tabla-bancaria th {
-    text-align: center;          /* Todos los títulos centrados */
-    color: var(--blue-dark);     /* Color azul */
+    text-align: center;
+    color: #bb86fc;
     font-weight: bold;
     padding: 10px;
 }
@@ -307,7 +308,7 @@ button:focus, .header-link:focus, .logout-link:focus, .help-link:focus {
 /* Solo Amount y Balance a la derecha */
 .tabla-bancaria td:nth-child(3),
 .tabla-bancaria td:nth-child(4) {
-    text-align: right !important;  /* !important fuerza que se aplique */
+    text-align: right !important;
 }
 /* =========================
    FORMULARIO SIGN-IN
@@ -317,14 +318,16 @@ button:focus, .header-link:focus, .logout-link:focus, .help-link:focus {
     text-align: center;
 }
 .recuadro-formulario h3 {
-    color: var(--blue-dark);
+    color: #bb86fc;
     margin-bottom: 20px;
 }
 #tfEmail, #tfPassword {
     width: 100%;
     padding: 12px;
     margin-bottom: 12px;
-    border: 1px solid var(--blue-dark);
+    background: #2c2c2c;
+    color: white;
+    border: 1px solid #444;
     border-radius: 8px;
 }
 .botones {
@@ -337,25 +340,26 @@ button:focus, .header-link:focus, .logout-link:focus, .help-link:focus {
     padding: 12px;
     border-radius: 8px;
     border: none;
-    color: white;
+    color: white; /* Texto blanco */
     font-size: 15px;
     cursor: pointer;
     transition: background 0.2s ease;
+    font-weight: bold;
 }
 .iniciar {
-    background-color: var(--blue-dark);
+    background-color: #bb86fc;
 }
 .iniciar:hover {
-    background-color: #002266;
+    background-color: #9965f4;
 }
 .cancelar {
-    background-color: #666666;
-}
-.cancelar:hover {
     background-color: #444444;
 }
+.cancelar:hover {
+    background-color: #333333;
+}
 .volver {
-    background-color: #cc0000;
+    background-color: #cf6679;
 }
 .volver:hover {
     background-color: #990000;
@@ -373,21 +377,21 @@ button:focus, .header-link:focus, .logout-link:focus, .help-link:focus {
     text-align: center;
     font-weight: bold;
     border-radius: 14px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     box-sizing: border-box;
     transition: all 0.25s ease;
 }
 /* ÉXITO */
 #responseMsg.success {
-    color: green;
-    background-color: #e0ffe0;
-    border: 1px solid green;
+    color: #4caf50;
+    background-color: #1b2e1b;
+    border: 1px solid #4caf50;
 }
 /* ERROR */
 #responseMsg.error {
-    color: red;
-    background-color: #ffe0e0;
-    border: 1px solid red;
+    color: #cf6679;
+    background-color: #2e1b1b;
+    border: 1px solid #cf6679;
 }
 /* =========================
    TABLA CUENTAS Y MOVIMIENTOS
@@ -405,7 +409,7 @@ button:focus, .header-link:focus, .logout-link:focus, .help-link:focus {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.45);
+    background: rgba(0,0,0,0.6);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -421,215 +425,171 @@ button:focus, .header-link:focus, .logout-link:focus, .help-link:focus {
 /* =========================
    MOVEMENTS
    ========================= */
-/* BOTÓN NEW MOVEMENT */
 .btn-new-movement {
-    background-color: var(--blue-dark); /* azul oscuro */
-    color: white;                       /* letras blancas */
+    background-color: #bb86fc;
+    color: white; /* Texto blanco */
     border: none;
+    font-weight: bold;
 }
 .btn-new-movement:hover {
-    background-color: #002266;          /* azul más intenso al pasar el mouse */
+    background-color: #9965f4;
 }
-/* BOTÓN UNDO LAST MOVEMENT */
 .btn-undo {
-    background-color: white;             /* fondo blanco */
-    color: var(--blue-dark);             /* letras azul oscuro */
-    border: 2px solid var(--blue-dark); /* borde azul oscuro */
+    background-color: transparent;
+    color: white; /* Texto blanco */
+    border: 2px solid #bb86fc;
 }
-btn-undo:hover {
-    background-color: var(--blue-light); /* azul clarito al pasar el mouse */
-    color: white;                        /* letras blancas en hover */
-    border-color: var(--blue-dark);      /* mantiene el borde azul */
+.btn-undo:hover {
+    background-color: #bb86fc;
 }
 /* =========================
    ACCOUNTS
    ========================= */
-.iniciar{
-    background-color: var(--blue-dark); /* azul oscuro */
-    color: white;                       /* letras blancas */
-    border: none;
-    border-radius: 4px;
-}
-/* BOTÓN MOVEMENTS */
 .movbutton {
-    background-color: var(--blue-dark);
-    color: white;
+    background-color: #bb86fc;
+    color: white; /* Texto blanco */
     margin-left: 10px;
     padding: 6px 12px;
     cursor: pointer;
     border-radius: 4px;
+    border: none;
+    font-weight: bold;
 }
 .movbutton:hover {
-    background-color: white;
-    color: blue;
+    background-color: #03dac6;
 }
-/* Estilo del botón movements en filas par */
 .tabla-bancaria tr:nth-child(odd) .movbutton {
-  background-color: white; /* Blanco */
-  color: var(--blue-dark);
-}
-/* Estilo del botón movements en filas impar */
-.tabla-bancaria tr:nth-child(even) .movbutton {
-  background-color: var(--blue-dark); /* Azul oscuro */
+  background-color: #bb86fc;
   color: white;
 }
-/* BÓTÓN DELETE ACCOUNT*/
+.tabla-bancaria tr:nth-child(even) .movbutton {
+  background-color: #03dac6;
+  color: white;
+}
 .borbutton {
-    background-color: white;
-    color: var(--blue-dark);
+    background-color: transparent;
+    color: white; /* Texto blanco */
     margin-left: 10px;
     padding: 6px 12px;
     cursor: pointer;
     border-radius: 4px;
+    border: 1px solid #cf6679;
 }
 .borbutton:hover {
-    background-color: #002266;
-    color: white;
-}
-/* Estilo del botón borrar en filas impar */
-.tabla-bancaria tr:nth-child(odd) .borbutton {
-  background-color: white; /* Blanco */
-  color: var(--blue-dark);
-}
-/* Estilo del botón borrar en filas par */
-.tabla-bancaria tr:nth-child(even) .borbutton {
-  background-color: var(--blue-dark); /* Azul oscuro */
-  color: white;
+    background-color: #cf6679;
 }
 /*==========================
    FILAS DE LAS TABLAS 
 ============================*/
 .tabla-bancaria tbody tr:nth-child(odd) {
-    background-color: var(--blue-dark); /* azul oscuro */
-    color: white;                       /* letras blancas */
+    background-color: #1a1a1a;
+    color: white;
 }
 .tabla-bancaria tbody tr:nth-child(even) {
-    background-color: white;            /* fondo blanco */
-    color: var(--blue-dark);            /* letras azul oscuro */
-    border: 2px solid var(--blue-dark); /* contorno azul */
+    background-color: #242424;
+    color: #bb86fc;
+    border: 2px solid #333;
 }
-/* Hover general para ambas filas */
 .tabla-bancaria tbody tr:hover {
-    background-color: var(--light-light-blue); /* azul clarito al pasar el mouse */
-    color: white;                        /* letras blancas al hover */
+    background-color: var(--light-light-blue);
+    color: white;
 }
 /*==========================
-   ALINEAR AMOUNT Y BALANCE (CUENTAS)
+   ALINEACIONES NUMÉRICAS
 ============================*/
 .tabla-bancaria td:nth-child(4),
 .tabla-bancaria td:nth-child(6),
 .tabla-bancaria td:nth-child(7),
 .tabla-bancaria th:nth-child(4),
 .tabla-bancaria th:nth-child(6),
-.tabla-bancaria th:nth-child(7) {
-    text-align: right; /* alinea contenido a la derecha */
-   padding-right: 12px;
-}
-
-/*==========================
-   ALINEAR AMOUNT Y BALANCE (MOVEMENTS)
-============================*/
+.tabla-bancaria th:nth-child(7),
 .tabla-bancaria td:nth-child(3),
-.tabla-bancaria td:nth-child(4),
-.tabla-bancaria th:nth-child(3),
-.tabla-bancaria th:nth-child(4) {
-    text-align: right; /* alinea contenido a la derecha */
+.tabla-bancaria th:nth-child(3) {
+    text-align: right !important;
     padding-right: 12px;
 }
 /* =========================
    FOOTER
    ========================= */
-    footer {
+footer {
     margin-top: auto;
     padding: 20px;
     text-align: center;
-    background-color: #eeeeee;
-    color: #555;
+    background-color: #000;
+    color: #777;
     width: 100%;
-    }
-    .help-link {
-    color: var(--blue-dark);
+}
+.help-link {
+    color: #bb86fc;
     font-weight: bold;
     font-size: 1rem;
     cursor: pointer;
     transition: opacity 0.2s ease, text-decoration 0.2s ease;
-    }
-    .help-link:hover {
+}
+.help-link:hover {
     opacity: 0.7;
     text-decoration: underline;
-    }
+}
     
 /* ============================================================
-   INDEPENDENCIA TOTAL DEL HTML
+   ESTILOS DE INDEPENDENCIA DE CAPAS (RA6)
    ============================================================ */
-
-/* CONTENEDORES DE BOTONES Y ALINEACION */
 .help-button-wrapper {
     text-align: right; 
     margin-top: 30px; 
     margin-right: 20px;
 }
-
 .table-main-container {
     width: 95%; 
     flex-direction: column;
 }
-
 .action-bar-left {
     text-align: left; 
     width: 100%; 
     margin-bottom: 15px;
 }
-
 .action-bar-center {
     text-align: center; 
     margin-top: 20px;
 }
-
-/* MODALES Y VISIBILIDAD INICIAL */
 .hidden-init {
     display: none;
 }
-
 .modal-small {
     max-width: 420px;
     width: 100%;
 }
-
 .modal-video {
     max-width: 900px; 
     width: 95%;
+    background: #1e1e1e;
+    border: 1px solid #444;
 }
-
-/* ELEMENTOS DE FORMULARIO */
 .input-form-full {
     width: 100%; 
     margin-bottom: 12px; 
     padding: 10px;
+    background: #2c2c2c;
+    color: white;
+    border: 1px solid #444;
 }
-
 .movement-type-flex {
     display: flex; 
     justify-content: space-around; 
     margin-bottom: 20px;
     border: none;
 }
-
-/* H5P PLAYER Y ESPACIADOS */
 .h5p-player-area {
     width: 100%; 
     min-height: 500px; 
-    background: #f9f9f9;
+    background: #000;
 }
-
 .spacing-top {
     margin-top: 15px;
 }
-
 .text-center {
     text-align: center;
 }
-
 /* =========================
    RESPONSIVE
    ========================= */
@@ -642,20 +602,8 @@ btn-undo:hover {
     .menu-container { flex-direction: column; gap: 16px; align-items:center; }
     header h1 { font-size: 1.5rem; }
     .bienvenida h2 { font-size: 1.3rem; }
+    .header-link, .logout-link { position: static; transform: none; display: block; margin: 5px 0; }
 }
-
-
-/* TO DO:estilos Inline: (DONE))*/
-
-.help-button-wrapper { text-align: right; margin-top: 30px; margin-right: 20px; }
-.table-main-container { width: 95%; flex-direction: column; }
-.action-bar-left { text-align: left; width: 100%; margin-bottom: 15px; }
-.hidden-init { display: none; }
-.modal-small { max-width: 420px; width: 100%; }
-.modal-video { max-width: 900px; width: 95%; }
-.input-form-full { width: 100%; margin-bottom: 12px; padding: 10px; }
-.h5p-player-area { width: 100%; min-height: 500px; background: #f9f9f9; }
-.spacing-top { margin-top: 15px; }
 
 /* ============================================================
    TO DO: estilo de la tabla responsiva
@@ -700,7 +648,8 @@ btn-undo:hover {
         justify-content: flex-end; }
 }
 
-/* ============================================================
+
+ /**============================================================
    TO DO: estilos del botón de cambio de estilo
    ============================================================ */
 .zona-herramientas {
@@ -727,4 +676,3 @@ btn-undo:hover {
     background-color: #e68a00;
     box-shadow: 2px 2px 0px #333; 
 }
-

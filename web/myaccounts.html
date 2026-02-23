@@ -3,13 +3,20 @@
 @FIXME UPDATE: Implementar la actualización del campo description de las cuentas.
 -->
 <!DOCTYPE html>
+<!--TODO: Añadir CSS alternativa-->
+<!--TODO: Hacer la tabla de cuentas responsiva (no es válido mostrar simplemente scroll horizontal)-->
+<!--TODO: Hacer accesibles los campos de entrada asociando label expolícitamente para todos los campos https://www.w3.org/WAI/tutorials/forms/labels/#associating-labels-explicitly-->
+
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="assets/theme/images/icon.png" type="image/x-icon">
     <title>Cuentas - PrBank</title>
+
     <link rel="stylesheet" href="assets/theme/css/styles.css" title="Modo Claro">
+    <link rel=" alternate stylesheet" href="assets/theme/css/styles.css" title="Modo Oscuro">
+
     <script src="assets/h5p-player/main.bundle.js"></script>
     <script src="assets/theme/js/myaccounts.js"></script>
     <script src="assets/theme/js/model.js"></script>
@@ -95,6 +102,7 @@
             </div>
         </div>
 
+
         <div id="videoLayer" class="capa-overlay hidden-init" role="dialog" aria-modal="true">
             <div class="recuadro-principal modal-video">
                 <h3>Help & Tutorial</h3>
@@ -107,6 +115,7 @@
     </main>
 
     <script>
+
         function goHome() { window.location.href = "mymain.html"; }
         function logout() { sessionStorage.clear(); window.location.href = "index.html"; }
     </script>
