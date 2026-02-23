@@ -1,0 +1,154 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 16-feb-2026, 8:37:11
+    Author     : alex
+*/
+/* ==========================================================
+VARIABLES MODO OSCURO
+========================================================== */
+
+:root {
+--blue-dark: #4da3ff;
+--blue-medium: #1f2a38;
+--blue-light: #2d3b4f;
+--white: #1a1a1a;
+--gray-light: #2a2a2a;
+}
+
+/* ==========================================================
+BODY
+========================================================== */
+
+body {
+background-color: #121212;
+color: #e0e0e0;
+}
+
+/* ==========================================================
+HEADER
+========================================================== */
+
+.header-bar {
+background-color: #0f1c2b;
+}
+
+.header-link,
+.logout-link {
+background-color: var(--blue-dark);
+color: white;
+}
+
+.header-link:hover,
+.logout-link:hover {
+background-color: #1e90ff;
+}
+
+/* ==========================================================
+SECCIONES PRINCIPALES
+========================================================== */
+
+.bienvenida {
+background-color: #1b2635;
+color: #ffffff;
+}
+
+.account-info {
+background-color: #1e1e1e;
+color: #e0e0e0;
+}
+
+.recuadro-principal {
+background-color: #1e1e1e;
+box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+}
+
+/* ==========================================================
+TABLA
+========================================================== */
+
+.tabla-bancaria {
+background-color: #1e1e1e;
+color: #e0e0e0;
+}
+
+.tabla-bancaria thead {
+background-color: #16202e;
+}
+
+.tabla-bancaria th {
+color: #4da3ff;
+}
+
+.tabla-bancaria tr {
+border-bottom: 1px solid #333;
+}
+
+.tabla-bancaria tr:hover {
+background-color: #2a2a2a;
+}
+
+.tabla-bancaria td {
+color: #e0e0e0;
+}
+
+/* ==========================================================
+BALANCE DESTACADO
+========================================================== */
+
+.balance-highlight {
+background-color: #16202e;
+color: #4da3ff;
+}
+
+/* ==========================================================
+BOTONES
+========================================================== */
+
+button {
+background-color: var(--blue-dark);
+color: white;
+}
+
+button:hover {
+background-color: #1e90ff;
+}
+
+/* ==========================================================
+FORMULARIO
+========================================================== */
+
+input[type="text"] {
+background-color: #2a2a2a;
+color: #ffffff;
+border: 1px solid #444;
+}
+
+input[type="text"]:focus {
+border-color: #4da3ff;
+outline: none;
+}
+
+label {
+color: #4da3ff;
+}
+
+/* ==========================================================
+MODALES
+========================================================== */
+
+.capa-overlay {
+background-color: rgba(0, 0, 0, 0.8);
+}
+
+/* ==========================================================
+FOOTER
+========================================================== */
+
+footer {
+background-color: #0f1c2b;
+color: #bbbbbb;
+}

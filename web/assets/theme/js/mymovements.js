@@ -1,5 +1,5 @@
-/* * To change this license header, choose License Headers in Project Properties
- * To change this template file, choose Tools | Templates
+/** 
+ * @todo:  Calcular y mostrar el valor agregado del total de los ingresos y de los gastos.
  */
 // ======================== CONSTANTES Y VARIABLES GLOBALES ====================
 // ARRAY FECHAS CORRECTAS 
@@ -18,10 +18,7 @@ let movements = [];
 document.addEventListener("DOMContentLoaded", function(){
     buildMovementsTable();
     updateAccountInfo();
-    syncAccountBalance();
-    // GUARDAR EL BALANCE INICIAL DE LA CUENTA
-    const initialBalance = parseFloat(sessionStorage.getItem("account.balance")) || 0;
-    sessionStorage.setItem("account.initialBalance", initialBalance);
+    //TODO No tiene sentido pasar el saldo de la cuenta al saldo inicial y guardarlo en la sesión en la carga de la página de movimientos.
     // ACTUALIZA EL ID Y EL BALANCE AL CARGAR LA PAGINA
     updateAccountInfo();
     // MUESTRA EL ID DE LA CUENTA
@@ -74,6 +71,10 @@ document.addEventListener("DOMContentLoaded", function(){
     document.getElementById("btnConfirmNo").addEventListener("click", function() {
     document.getElementById("confirmLayer").style.display = "none"; // Cerramos sin borrar
     });
+    // NAVEGACIÓN A CUENTAS
+    document.getElementById("btnGoToAccounts").addEventListener("click", goToAccounts);
+    // CERRAR SESIÓN
+    document.getElementById("btnLogout").addEventListener("click", logout);
 });
 // ========================= FETCH MOVIMIENTOS =======================
 // LEER TABLAS EN EL SERVIDOR (cRud)
@@ -135,6 +136,7 @@ async function buildMovementsTable() {
         tbody.appendChild(row);
     }
     // ACTUALIZA LOS DASTOS DE LA CUENTA EN PANTALLA AL MAS RECIENTE
+    updateTotals(movements);
     updateAccountInfo();
 }
 // =================== CREACION DE MOVIMIENTOS ====================
@@ -145,7 +147,15 @@ async function createMovement(evt) {
     try {
         const tfAmount = document.getElementById("tfAmount");
         const rbDeposit = document.getElementById("rbDeposit");
-
+        //TODO Utilizar la siguiente RegExp para validar que el importe pueda introducirse con separador de decimales y de miles.
+        // const esAmountRegex = /^(?:\d{1,15}|\d{1,3}(?:\.\d{3}){1,4})(?:,\d{1,2})?$/;
+        /* Explanation for esAmountRegex:
+          (?:                                # integer part options
+            \d{1,15}                         # 1 to 15 digits without thousand separator
+            | \d{1,3}(?:\.\d{3}){1,4}        # 1–3 digits, then 1–4 groups of ".ddd"
+           )
+          (?:,\d{1,2})?                      # optional decimal with 1 or 2 digits
+         */
         let amountValue = parseFloat(tfAmount.value);
         if (isNaN(amountValue) || amountValue <= 0) {
             alert("Please enter a valid positive amount.");
@@ -168,14 +178,14 @@ async function createMovement(evt) {
                 return;
             }
         }
-
-        const newMovement = {
-            id: null,
-            amount: amountValue,
-            description: description,
-            timestamp: new Date().toISOString(),
-            balance: newBalance
-        };
+        //FIXME Instanciar un objeto Movement y utilizar su constructor para inicializarlo.
+        const newMovement = new Movement(
+            null,
+            amountValue,
+            description,
+            new Date().toISOString(),
+            newBalance
+        );
 
         const response = await fetch(
             SERVICE_DEL_URL + sessionStorage.getItem("account.id"),
@@ -194,7 +204,7 @@ async function createMovement(evt) {
         }
 
         account.balance = newBalance;
-        await syncAccountBalance(account);
+        await syncAccountBalance(sessionStorage.getItem("account.id"), newBalance);
 
         await buildMovementsTable();
         updateAccountInfo();
@@ -350,12 +360,34 @@ async function fetchAccountById(accountId) {
     });
 
     if (!response.ok) {
-        throw new Error("Error fetching account");
+        // Cambia esta línea para ver el status real
+        throw new Error(`Error fetching account: ${response.status} ${response.statusText} — URL: ${ACCOUNT_URL + accountId}`);
     }
 
     return await response.json();
 }
+// ======================== TODO TOTALS ======================================
+// ====================== TOTALES INGRESOS Y GASTOS ======================
+function updateTotals(movements) {
+    let totalIncome = 0;
+    let totalExpenses = 0;
 
+    movements.forEach(movement => {
+        if (movement.description === "Deposit") {
+            totalIncome += parseFloat(movement.amount);
+        } else {
+            totalExpenses += parseFloat(movement.amount);
+        }
+    });
+
+    const formatter = new Intl.NumberFormat("es-ES", {
+        style: "currency",
+        currency: "EUR"
+    });
+
+    document.getElementById("totalIncome").textContent = formatter.format(totalIncome);
+    document.getElementById("totalExpenses").textContent = formatter.format(totalExpenses);
+}
 // ======================== SCRIPTS DE NAVEGACION ============================
 function goToAccounts() {
         window.location.href = "myaccounts.html";
@@ -363,3 +395,13 @@ function goToAccounts() {
 function logout() {
         window.location.href = "index.html";
     }
+
+
+/*Examen
+ * FIXME MOVEMENTS (OK)
+ * TODO BOTONES (OK)
+ * TODO TOTALPAYMENTS/DEPOSITS(OK)
+ * SENDOS ELEMENTOS (OK)
+ * TODO ELIMINAR LINEA ABSURDA (OK)
+ * TODO REGEXP (NO)
+ */
