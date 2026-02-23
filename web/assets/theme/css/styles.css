@@ -69,14 +69,14 @@ header {
 }
 /* Botones en header / contenedores fuera de .botones */
 .header-btn {
-    padding: 12px 20px;      /* mismo tamaño que otros botones */
+    padding: 12px 20px;      /* mismo tamaÃ±o que otros botones */
     font-size: 15px;
     border-radius: 8px;
     min-height: 44px;        /* fuerza la misma altura */
     line-height: 1.2;        /* consistente */
     cursor: pointer;
 }
-/* Cerrar sesión a la derecha */
+/* Cerrar sesiÃ³n a la derecha */
 .logout-link {
     position: absolute;
     right: 25px;
@@ -293,7 +293,7 @@ button:focus, .header-link:focus, .logout-link:focus, .help-link:focus {
    ENCABEZADOS DE LA TABLA
 ============================ */
 .tabla-bancaria th {
-    text-align: center;          /* Todos los títulos centrados */
+    text-align: center;          /* Todos los tÃ­tulos centrados */
     color: var(--blue-dark);     /* Color azul */
     font-weight: bold;
     padding: 10px;
@@ -377,7 +377,7 @@ button:focus, .header-link:focus, .logout-link:focus, .help-link:focus {
     box-sizing: border-box;
     transition: all 0.25s ease;
 }
-/* ÉXITO */
+/* ÃXITO */
 #responseMsg.success {
     color: green;
     background-color: #e0ffe0;
@@ -411,7 +411,7 @@ button:focus, .header-link:focus, .logout-link:focus, .help-link:focus {
     align-items: center;
     z-index: 100;
 }
-/* Botón en la izquierda del header */
+/* BotÃ³n en la izquierda del header */
 .header-left-btn {
     position: absolute;
     left: 25px;
@@ -421,16 +421,16 @@ button:focus, .header-link:focus, .logout-link:focus, .help-link:focus {
 /* =========================
    MOVEMENTS
    ========================= */
-/* BOTÓN NEW MOVEMENT */
+/* BOTÃN NEW MOVEMENT */
 .btn-new-movement {
     background-color: var(--blue-dark); /* azul oscuro */
     color: white;                       /* letras blancas */
     border: none;
 }
 .btn-new-movement:hover {
-    background-color: #002266;          /* azul más intenso al pasar el mouse */
+    background-color: #002266;          /* azul mÃ¡s intenso al pasar el mouse */
 }
-/* BOTÓN UNDO LAST MOVEMENT */
+/* BOTÃN UNDO LAST MOVEMENT */
 .btn-undo {
     background-color: white;             /* fondo blanco */
     color: var(--blue-dark);             /* letras azul oscuro */
@@ -450,7 +450,7 @@ btn-undo:hover {
     border: none;
     border-radius: 4px;
 }
-/* BOTÓN MOVEMENTS */
+/* BOTÃN MOVEMENTS */
 .movbutton {
     background-color: var(--blue-dark);
     color: white;
@@ -463,17 +463,17 @@ btn-undo:hover {
     background-color: white;
     color: blue;
 }
-/* Estilo del botón movements en filas par */
+/* Estilo del botÃ³n movements en filas par */
 .tabla-bancaria tr:nth-child(odd) .movbutton {
   background-color: white; /* Blanco */
   color: var(--blue-dark);
 }
-/* Estilo del botón movements en filas impar */
+/* Estilo del botÃ³n movements en filas impar */
 .tabla-bancaria tr:nth-child(even) .movbutton {
   background-color: var(--blue-dark); /* Azul oscuro */
   color: white;
 }
-/* BÓTÓN DELETE ACCOUNT*/
+/* BÃTÃN DELETE ACCOUNT*/
 .borbutton {
     background-color: white;
     color: var(--blue-dark);
@@ -486,12 +486,12 @@ btn-undo:hover {
     background-color: #002266;
     color: white;
 }
-/* Estilo del botón borrar en filas impar */
+/* Estilo del botÃ³n borrar en filas impar */
 .tabla-bancaria tr:nth-child(odd) .borbutton {
   background-color: white; /* Blanco */
   color: var(--blue-dark);
 }
-/* Estilo del botón borrar en filas par */
+/* Estilo del botÃ³n borrar en filas par */
 .tabla-bancaria tr:nth-child(even) .borbutton {
   background-color: var(--blue-dark); /* Azul oscuro */
   color: white;
@@ -569,7 +569,6 @@ btn-undo:hover {
     margin-top: 30px; 
     margin-right: 20px;
 }
-
 .table-main-container {
     width: 95%; 
     flex-direction: column;
@@ -621,7 +620,6 @@ btn-undo:hover {
     min-height: 500px; 
     background: #f9f9f9;
 }
-
 .spacing-top {
     margin-top: 15px;
 }
@@ -726,5 +724,38 @@ btn-undo:hover {
 #boton-estilo:hover {
     background-color: #e68a00;
     box-shadow: 2px 2px 0px #333; 
+}
+
+
+/*============================
+    RESPONSIVE TODO
+    ==========================*/
+@media (max-width: 768px) {
+    .table-main-container {
+        overflow-x: auto;
+    }
+
+    .tabla-bancaria {
+        width: 100%;
+        min-width: 600px;
+        font-size: 0.9rem;
+    }
+
+    .tabla-bancaria th,
+    .tabla-bancaria td {
+        padding: 6px 8px;
+    }
+
+    /* Ajustar info de cuenta en vertical */
+    .account-info {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+
+    .balance-highlight {
+        text-align: center;
+        font-size: 1.1rem;
+    }
 }
 
